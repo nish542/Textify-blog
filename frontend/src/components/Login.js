@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 // Configure axios defaults
-axios.defaults.timeout = 5000; // 5 second timeout
-axios.defaults.baseURL = 'https://textify-kai4.onrender.com'; // Changed to match FastAPI default port
+axios.defaults.timeout = 30000; // Increased to 30 seconds for Render's cold starts
+axios.defaults.baseURL = 'https://textify-kai4.onrender.com';
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 axios.defaults.withCredentials = true;
 
@@ -168,81 +168,126 @@ export default function Login({ mode, onLogin }) {
 
   return (
     <>
-      {/* Your UI components here */}
       <button 
         onClick={() => setShowModal(true)}
-        className="login-button"
+        className={`btn btn-outline-${mode === 'light' ? 'primary' : 'light'}`}
       >
-        {mode === 'login' ? 'Login' : 'Sign Up'}
+        {isLogin ? 'Login' : 'Sign Up'}
       </button>
       
       {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={handleModalClose}>&times;</span>
-            <h2>{isLogin ? 'Login' : 'Create Account'}</h2>
+        <div className="modal" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div className="modal-content" style={{
+            backgroundColor: mode === 'light' ? 'white' : '#22262b',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '90%',
+            maxWidth: '500px',
+            position: 'relative',
+            color: mode === 'light' ? 'black' : 'white'
+          }}>
+            <span className="close" onClick={handleModalClose} style={{
+              position: 'absolute',
+              right: '20px',
+              top: '10px',
+              fontSize: '24px',
+              cursor: 'pointer',
+              color: mode === 'light' ? 'black' : 'white'
+            }}>&times;</span>
+            <h2 style={{ marginBottom: '20px' }}>{isLogin ? 'Login' : 'Create Account'}</h2>
             
-            {error && <div className="error-message">{error}</div>}
-            {success && <div className="success-message">{success}</div>}
+            {error && <div className="alert alert-danger">{error}</div>}
+            {success && <div className="alert alert-success">{success}</div>}
             
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="username">Username</label>
+              <div className="form-group mb-3">
+                <label htmlFor="username" className="form-label">Username</label>
                 <input
                   type="text"
+                  className="form-control"
                   id="username"
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
                   required
+                  style={{
+                    backgroundColor: mode === 'light' ? 'white' : '#2c3034',
+                    color: mode === 'light' ? 'black' : 'white',
+                    border: '1px solid #ced4da'
+                  }}
                 />
               </div>
               
               {!isLogin && (
-                <div className="form-group">
-                  <label htmlFor="email">Email</label>
+                <div className="form-group mb-3">
+                  <label htmlFor="email" className="form-label">Email</label>
                   <input
                     type="email"
+                    className="form-control"
                     id="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
                     required={!isLogin}
+                    style={{
+                      backgroundColor: mode === 'light' ? 'white' : '#2c3034',
+                      color: mode === 'light' ? 'black' : 'white',
+                      border: '1px solid #ced4da'
+                    }}
                   />
                 </div>
               )}
               
-              <div className="form-group">
-                <label htmlFor="password">Password</label>
+              <div className="form-group mb-3">
+                <label htmlFor="password" className="form-label">Password</label>
                 <input
                   type="password"
+                  className="form-control"
                   id="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   required
+                  style={{
+                    backgroundColor: mode === 'light' ? 'white' : '#2c3034',
+                    color: mode === 'light' ? 'black' : 'white',
+                    border: '1px solid #ced4da'
+                  }}
                 />
               </div>
               
               <button 
                 type="submit" 
-                className="submit-button"
+                className={`btn btn-${mode === 'light' ? 'primary' : 'light'} w-100`}
                 disabled={isLoading}
               >
                 {isLoading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
               </button>
             </form>
             
-            <div className="toggle-form">
-              <p>
+            <div className="toggle-form mt-3 text-center">
+              <p className="mb-0">
                 {isLogin ? "Don't have an account? " : "Already have an account? "}
                 <button 
                   type="button"
+                  className="btn btn-link"
                   onClick={() => {
                     setIsLogin(!isLogin);
                     setError('');
                     setSuccess('');
                   }}
+                  style={{ color: mode === 'light' ? '#0d6efd' : '#fff' }}
                 >
                   {isLogin ? 'Sign Up' : 'Login'}
                 </button>
@@ -253,4 +298,5 @@ export default function Login({ mode, onLogin }) {
       )}
     </>
   );
+  
 }
