@@ -14,7 +14,7 @@ async def create_document(
     current_user = Depends(get_current_user)
 ):
     document_dict = document.dict()
-    document_dict["user_id"] = current_user.id
+    document_dict["user_id"] = str(current_user.id)
     document_dict["created_at"] = datetime.utcnow()
     document_dict["updated_at"] = datetime.utcnow()
     
@@ -24,7 +24,7 @@ async def create_document(
 
 @router.get("/documents", response_model=List[Document])
 async def get_user_documents(current_user = Depends(get_current_user)):
-    documents = await db.documents.find({"user_id": current_user.id}).to_list(length=100)
+    documents = await db.documents.find({"user_id": str(current_user.id)}).to_list(length=100)
     return [Document(**doc) for doc in documents]
 
 @router.get("/documents/{document_id}", response_model=Document)
@@ -34,13 +34,15 @@ async def get_document(
 ):
     document = await db.documents.find_one({
         "_id": ObjectId(document_id),
-        "user_id": current_user.id
+        "user_id": str(current_user.id)
     })
+    
     if not document:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Document not found"
         )
+    
     return Document(**document)
 
 @router.put("/documents/{document_id}", response_model=Document)
@@ -52,8 +54,9 @@ async def update_document(
     # Check if document exists and belongs to user
     existing_doc = await db.documents.find_one({
         "_id": ObjectId(document_id),
-        "user_id": current_user.id
+        "user_id": str(current_user.id)
     })
+    
     if not existing_doc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -79,8 +82,9 @@ async def delete_document(
 ):
     result = await db.documents.delete_one({
         "_id": ObjectId(document_id),
-        "user_id": current_user.id
+        "user_id": str(current_user.id)
     })
+    
     if result.deleted_count == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

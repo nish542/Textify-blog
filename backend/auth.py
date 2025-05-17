@@ -4,24 +4,18 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Optional
-from pymongo import MongoClient
-from bson import ObjectId
 from schemas import UserCreate, User, Token, TokenData
 import os
 from dotenv import load_dotenv
 import logging
 import secrets
+from database import db
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 load_dotenv()
-
-# MongoDB connection
-client = MongoClient(os.getenv("MONGODB_URL", "mongodb://localhost:27017"))
-db = client.textify
-users_collection = db.users
 
 # Security
 # Generate a secure secret key if not provided
@@ -79,7 +73,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         logger.error(f"JWT decode error: {str(e)}")
         raise credentials_exception
     
-    user = users_collection.find_one({"username": token_data.username})
+    user = await db.users.find_one({"username": token_data.username})
     if user is None:
         logger.error(f"User not found for username: {token_data.username}")
         raise credentials_exception
@@ -88,32 +82,33 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 @router.post("/register", response_model=User)
 async def register_user(user: UserCreate):
     logger.info(f"Received registration request for username: {user.username}, email: {user.email}")
-    
+
     # Check if username exists
-    if users_collection.find_one({"username": user.username}):
+    if await db.users.find_one({"username": user.username}):
         logger.warning(f"Username {user.username} already exists")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered"
         )
-    
+
     # Check if email exists
-    if users_collection.find_one({"email": user.email}):
+    if await db.users.find_one({"email": user.email}):
         logger.warning(f"Email {user.email} already exists")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
         )
-    
+
     # Create new user
     user_dict = user.dict()
-    user_dict["password"] = get_password_hash(user.password)
+    user_dict["hashed_password"] = get_password_hash(user.password)
+    del user_dict["password"]  # Remove plain password
     user_dict["created_at"] = datetime.utcnow()
     user_dict["is_active"] = True
     
     try:
         logger.info(f"Attempting to create user: {user.username}")
-        result = users_collection.insert_one(user_dict)
+        result = await db.users.insert_one(user_dict)
         user_dict["_id"] = result.inserted_id
         logger.info(f"Successfully created user: {user.username}")
         return User(**user_dict)
@@ -128,7 +123,7 @@ async def register_user(user: UserCreate):
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     try:
         logger.info(f"Login attempt for username: {form_data.username}")
-        user = users_collection.find_one({"username": form_data.username})
+        user = await db.users.find_one({"username": form_data.username})
         
         if not user:
             logger.warning(f"User not found: {form_data.username}")
@@ -138,7 +133,10 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
                 headers={"WWW-Authenticate": "Bearer"},
             )
         
-        if not verify_password(form_data.password, user["password"]):
+        # Check if we're using hashed_password or password field
+        password_field = "hashed_password" if "hashed_password" in user else "password"
+        
+        if not verify_password(form_data.password, user["hashed_password"]):
             logger.warning(f"Invalid password for user: {form_data.username}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -150,6 +148,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         access_token = create_access_token(
             data={"sub": user["username"]}, expires_delta=access_token_expires
         )
+        
         logger.info(f"Successfully generated token for user: {form_data.username}")
         return {"access_token": access_token, "token_type": "bearer"}
     except Exception as e:

@@ -2,19 +2,23 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 // Configure axios defaults
-axios.defaults.timeout = 30000; // Increased to 30 seconds for Render's cold starts
-axios.defaults.baseURL = 'https://textify-kai4.onrender.com';
-axios.defaults.headers.common['Content-Type'] = 'application/json';
-axios.defaults.withCredentials = true;
+const api = axios.create({
+  baseURL: 'https://textify-kai4.onrender.com',
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  withCredentials: true
+});
 
 // Add request interceptor for logging
-axios.interceptors.request.use(request => {
+api.interceptors.request.use(request => {
   console.log('Starting Request:', request);
   return request;
 });
 
 // Add response interceptor for logging
-axios.interceptors.response.use(
+api.interceptors.response.use(
   response => {
     console.log('Response:', response);
     return response;
@@ -48,7 +52,7 @@ export default function Login({ mode, onLogin }) {
 
   const fetchUserProfile = async (token) => {
     try {
-      const response = await axios.get('/user/profile', {
+      const response = await api.get('/user/profile', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -69,7 +73,7 @@ export default function Login({ mode, onLogin }) {
     try {
       if (isLogin) {
         console.log('Attempting to login with username:', formData.username);
-        const response = await axios.post('/auth/token', 
+        const response = await api.post('/auth/token', 
           new URLSearchParams({
             'username': formData.username,
             'password': formData.password
@@ -86,7 +90,7 @@ export default function Login({ mode, onLogin }) {
           localStorage.setItem('token', token);
           
           // Set token for all subsequent requests
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           
           // Fetch user profile
           try {
@@ -111,7 +115,7 @@ export default function Login({ mode, onLogin }) {
         });
         
         try {
-          const response = await axios.post('/auth/register', {
+          const response = await api.post('/auth/register', {
             username: formData.username,
             password: formData.password,
             email: formData.email
@@ -298,5 +302,4 @@ export default function Login({ mode, onLogin }) {
       )}
     </>
   );
-  
 }

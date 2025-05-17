@@ -8,12 +8,6 @@ import logging
 import time
 import traceback
 
-origins = [
-         # Alternative domain if you have one
-    "https://textify-na.vercel.app",    # New Vercel domain
-    "http://localhost:3000"             # For local development
-]
-
 # Configure logging
 logging.basicConfig(
     level=logging.DEBUG,
@@ -24,15 +18,27 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+# Fix the origins list
+origins = [
+    "https://textify-full.vercel.app",  # Your main Vercel domain
+    "https://textify-na.vercel.app",    # Your alternative Vercel domain
+    "http://localhost:3000"             # For local development
+]
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # React app's address
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["Content-Type"]
 )
+
+# Add OPTIONS handler for preflight requests
+@app.options("/{path:path}")
+async def options_handler(path: str):
+    return JSONResponse(status_code=200)
 
 # Add middleware for request logging
 @app.middleware("http")
