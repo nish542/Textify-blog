@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Configure axios defaults
 const api = axios.create({
-  baseURL: 'https://textify-kai4.onrender.com',
+  baseURL: '/',  // Use relative URL
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json'
