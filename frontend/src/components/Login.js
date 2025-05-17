@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Configure axios defaults
 axios.defaults.timeout = 5000; // 5 second timeout
-axios.defaults.baseURL = 'http://localhost:8003';
+axios.defaults.baseURL = 'https://textify-kai4.onrender.com'; // Changed to match FastAPI default port
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 axios.defaults.withCredentials = true;
 
@@ -43,10 +43,21 @@ export default function Login({ mode, onLogin }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const fetchUserProfile = async (token) => {
+    try {
+      const response = await axios.get('/user/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      throw error;
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -66,86 +77,85 @@ export default function Login({ mode, onLogin }) {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'
             }
-          });
-        
+          }
+        );
+
         console.log('Login response:', response.data);
         if (response.data.access_token) {
-          localStorage.setItem('token', response.data.access_token);
-          onLogin(response.data.access_token);
-          setShowModal(false);
+          const token = response.data.access_token;
+          localStorage.setItem('token', token);
+          
+          // Set token for all subsequent requests
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          
+          // Fetch user profile
+          try {
+            const userProfile = await fetchUserProfile(token);
+            console.log('User profile:', userProfile);
+            onLogin(token, userProfile);
+            setShowModal(false);
+          } catch (profileError) {
+            console.error('Error fetching profile after login:', profileError);
+            // Still consider login successful even if profile fetch fails
+            onLogin(token);
+            setShowModal(false);
+          }
         } else {
           setError('Invalid response from server');
         }
       } else {
         // Registration
-        console.log('Attempting to register with:', {
-          username: formData.username,
-          email: formData.email
+        console.log('Attempting to register with:', { 
+          username: formData.username, 
+          email: formData.email 
         });
-
+        
         try {
           const response = await axios.post('/auth/register', {
             username: formData.username,
             password: formData.password,
             email: formData.email
           });
-
+          
           console.log('Registration response:', response.data);
-
           if (response.data) {
             setSuccess('Registration successful! Please login with your credentials.');
             // Keep username and email, clear password
-            setFormData(prev => ({
-              ...prev,
-              password: ''
-            }));
+            setFormData(prev => ({ ...prev, password: '' }));
             // Switch to login view after a short delay
             setTimeout(() => {
               setIsLogin(true);
             }, 2000);
           }
         } catch (registrationError) {
-          console.error('Registration error details:', {
-            message: registrationError.message,
-            code: registrationError.code,
-            response: registrationError.response,
-            request: registrationError.request
-          });
-          
-          if (registrationError.code === 'ECONNABORTED') {
-            setError('Request timed out. Please check if the server is running.');
-          } else if (registrationError.code === 'ECONNREFUSED') {
-            setError('Cannot connect to the server. Please make sure the backend is running on port 8001.');
-          } else if (registrationError.response?.data?.detail) {
-            setError(registrationError.response.data.detail);
-          } else if (registrationError.message) {
-            setError(`Registration failed: ${registrationError.message}`);
-          } else {
-            setError('Registration failed. Please try again.');
-          }
+          handleError(registrationError, 'Registration failed');
         }
       }
     } catch (err) {
-      console.error('Login error:', {
-        message: err.message,
-        code: err.code,
-        response: err.response,
-        request: err.request
-      });
-      
-      if (err.code === 'ECONNABORTED') {
-        setError('Request timed out. Please check if the server is running.');
-      } else if (err.code === 'ECONNREFUSED') {
-        setError('Cannot connect to the server. Please make sure the backend is running on port 8001.');
-      } else if (err.response?.data?.detail) {
-        setError(err.response.data.detail);
-      } else if (err.message) {
-        setError(`An error occurred: ${err.message}`);
-      } else {
-        setError('An error occurred. Please try again.');
-      }
+      handleError(err, 'Login failed');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleError = (err, defaultMessage) => {
+    console.error(`${defaultMessage} error:`, {
+      message: err.message,
+      code: err.code,
+      response: err.response,
+      request: err.request
+    });
+    
+    if (err.code === 'ECONNABORTED') {
+      setError('Request timed out. Please check if the server is running.');
+    } else if (err.code === 'ECONNREFUSED') {
+      setError('Cannot connect to the server. Please make sure the backend is running.');
+    } else if (err.response?.data?.detail) {
+      setError(err.response.data.detail);
+    } else if (err.message) {
+      setError(`An error occurred: ${err.message}`);
+    } else {
+      setError(`${defaultMessage}. Please try again.`);
     }
   };
 
@@ -153,143 +163,94 @@ export default function Login({ mode, onLogin }) {
     setShowModal(false);
     setError('');
     setSuccess('');
-    setFormData({
-      username: '',
-      password: '',
-      email: ''
-    });
+    setFormData({ username: '', password: '', email: '' });
   };
 
   return (
     <>
+      {/* Your UI components here */}
       <button 
-        className={`btn btn-outline-${mode === 'light' ? 'primary' : 'light'} ms-2`}
         onClick={() => setShowModal(true)}
+        className="login-button"
       >
-        {localStorage.getItem('token') ? 'Profile' : 'Login'}
+        {mode === 'login' ? 'Login' : 'Sign Up'}
       </button>
-
+      
       {showModal && (
-        <div className="modal show d-block" tabIndex="-1">
-          <div className="modal-dialog">
-            <div className="modal-content" style={{
-              backgroundColor: mode === 'dark' ? '#22262b' : 'white',
-              color: mode === 'dark' ? 'white' : 'black'
-            }}>
-              <div className="modal-header">
-                <h5 className="modal-title">{isLogin ? 'Login' : 'Register'}</h5>
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={handleModalClose}>&times;</span>
+            <h2>{isLogin ? 'Login' : 'Create Account'}</h2>
+            
+            {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
+            
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              {!isLogin && (
+                <div className="form-group">
+                  <label htmlFor="email">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required={!isLogin}
+                  />
+                </div>
+              )}
+              
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              <button 
+                type="submit" 
+                className="submit-button"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
+              </button>
+            </form>
+            
+            <div className="toggle-form">
+              <p>
+                {isLogin ? "Don't have an account? " : "Already have an account? "}
                 <button 
-                  type="button" 
-                  className="btn-close" 
-                  onClick={handleModalClose}
-                  style={{ filter: mode === 'dark' ? 'invert(1)' : 'none' }}
-                ></button>
-              </div>
-              <div className="modal-body">
-                {error && (
-                  <div className="alert alert-danger" role="alert">
-                    <i className="fas fa-exclamation-circle me-2"></i>
-                    {error}
-                  </div>
-                )}
-                {success && (
-                  <div className="alert alert-success" role="alert">
-                    <i className="fas fa-check-circle me-2"></i>
-                    {success}
-                  </div>
-                )}
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-3">
-                    <label className="form-label">Username</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleChange}
-                      required
-                      style={{
-                        backgroundColor: mode === 'dark' ? '#2c3034' : 'white',
-                        color: mode === 'dark' ? 'white' : 'black',
-                        border: '1px solid #ced4da'
-                      }}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Password</label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                      style={{
-                        backgroundColor: mode === 'dark' ? '#2c3034' : 'white',
-                        color: mode === 'dark' ? 'white' : 'black',
-                        border: '1px solid #ced4da'
-                      }}
-                    />
-                  </div>
-                  {!isLogin && (
-                    <div className="mb-3">
-                      <label className="form-label">Email</label>
-                      <input
-                        type="email"
-                        className="form-control"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        style={{
-                          backgroundColor: mode === 'dark' ? '#2c3034' : 'white',
-                          color: mode === 'dark' ? 'white' : 'black',
-                          border: '1px solid #ced4da'
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div className="d-flex justify-content-between align-items-center">
-                    <button 
-                      type="submit" 
-                      className="btn btn-primary"
-                      disabled={isLoading || success}
-                    >
-                      {isLoading ? (
-                        <>
-                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                          {isLogin ? 'Logging in...' : 'Registering...'}
-                        </>
-                      ) : (
-                        isLogin ? 'Login' : 'Register'
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-link"
-                      onClick={() => {
-                        setIsLogin(!isLogin);
-                        setError('');
-                        setSuccess('');
-                        setFormData(prev => ({
-                          ...prev,
-                          password: ''
-                        }));
-                      }}
-                      disabled={isLoading || success}
-                    >
-                      {isLogin ? 'Need an account? Register' : 'Already have an account? Login'}
-                    </button>
-                  </div>
-                </form>
-              </div>
+                  type="button"
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                    setError('');
+                    setSuccess('');
+                  }}
+                >
+                  {isLogin ? 'Sign Up' : 'Login'}
+                </button>
+              </p>
             </div>
           </div>
         </div>
       )}
-      {showModal && (
-        <div className="modal-backdrop show"></div>
-      )}
     </>
   );
-} 
+}
