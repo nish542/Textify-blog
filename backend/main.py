@@ -33,7 +33,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://textify-na.vercel.app", "http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
     max_age=3600,
@@ -42,7 +42,16 @@ app.add_middleware(
 # Add OPTIONS handler for preflight requests
 @app.options("/{path:path}")
 async def options_handler(path: str):
-    return JSONResponse(status_code=200)
+    return JSONResponse(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "https://textify-na.vercel.app",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Max-Age": "3600",
+        }
+    )
 
 # Add middleware for request logging
 @app.middleware("http")

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Configure axios defaults
 const api = axios.create({
-  baseURL: process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://textify-na.vercel.app',
+  baseURL: 'https://textify-kai4.onrender.com',  // Use the backend URL directly
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -15,11 +15,6 @@ const api = axios.create({
 // Add request interceptor for logging
 api.interceptors.request.use(request => {
   console.log('Starting Request:', request);
-  // Ensure the request URL is relative
-  if (request.url.startsWith('http')) {
-    const url = new URL(request.url);
-    request.url = url.pathname + url.search;
-  }
   return request;
 });
 
@@ -125,6 +120,10 @@ export default function Login({ mode, onLogin }) {
             username: formData.username,
             password: formData.password,
             email: formData.email
+          }, {
+            headers: {
+              'Content-Type': 'application/json'
+            }
           });
           
           console.log('Registration response:', response.data);
