@@ -3,18 +3,25 @@ import axios from 'axios';
 
 // Configure axios defaults
 const api = axios.create({
-  baseURL: 'https://textify-kai4.onrender.com',  // Use the backend URL directly
+  baseURL: 'https://textify-kai4.onrender.com',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
   },
-  withCredentials: true
+  withCredentials: false  // Changed to false to avoid CORS issues with credentials
 });
 
 // Add request interceptor for logging
 api.interceptors.request.use(request => {
   console.log('Starting Request:', request);
+  // Add timestamp to prevent caching
+  if (request.method === 'get') {
+    request.params = { ...request.params, _t: Date.now() };
+  }
   return request;
 });
 
@@ -31,6 +38,14 @@ api.interceptors.response.use(
       response: error.response,
       request: error.request
     });
+    
+    // Handle specific error cases
+    if (error.code === 'ERR_NETWORK') {
+      console.error('Network error - please check if the server is running and accessible');
+    } else if (error.response) {
+      console.error('Server responded with error:', error.response.status);
+    }
+    
     return Promise.reject(error);
   }
 );
@@ -122,7 +137,8 @@ export default function Login({ mode, onLogin }) {
             email: formData.email
           }, {
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
             }
           });
           
