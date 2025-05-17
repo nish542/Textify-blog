@@ -3,10 +3,11 @@ import axios from 'axios';
 
 // Configure axios defaults
 const api = axios.create({
-  baseURL: '/',  // Use relative URL
+  baseURL: process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://textify-na.vercel.app',
   timeout: 30000,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
   },
   withCredentials: true
 });
@@ -14,6 +15,11 @@ const api = axios.create({
 // Add request interceptor for logging
 api.interceptors.request.use(request => {
   console.log('Starting Request:', request);
+  // Ensure the request URL is relative
+  if (request.url.startsWith('http')) {
+    const url = new URL(request.url);
+    request.url = url.pathname + url.search;
+  }
   return request;
 });
 

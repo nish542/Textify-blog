@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from auth import router as auth_router
@@ -7,6 +8,15 @@ from routes.document import router as document_router
 import logging
 import time
 import traceback
+from pydantic import BaseModel
+from typing import Optional
+import jwt
+from datetime import datetime, timedelta
+from passlib.context import CryptContext
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(
@@ -18,21 +28,15 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# Fix the origins list
-origins = [
-    "https://textify-full.vercel.app",  # Your main Vercel domain
-    "https://textify-na.vercel.app",    # Your alternative Vercel domain
-    "http://localhost:3000"             # For local development
-]
-
-# Configure CORS
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["https://textify-na.vercel.app", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["Content-Type"]
+    expose_headers=["*"],
+    max_age=3600,
 )
 
 # Add OPTIONS handler for preflight requests
