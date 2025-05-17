@@ -9,8 +9,8 @@ import time
 import traceback
 
 origins = [
-    "https://textify-full.vercel.app",  # Your actual Vercel domain
-    "https://textify.vercel.app",       # Alternative domain if you have one
+         # Alternative domain if you have one
+    "https://textify-na.vercel.app",    # New Vercel domain
     "http://localhost:3000"             # For local development
 ]
 
@@ -31,6 +31,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Content-Type"]
 )
 
 # Add middleware for request logging
