@@ -31,26 +31,17 @@ app = FastAPI()
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
-    allow_credentials=False,  # Changed to False since we're allowing all origins
+    allow_origins=[
+        "https://textify-full.vercel.app",  # Your Vercel domain
+        "https://textify-na.vercel.app",    # Any alternative domains
+        "http://localhost:3000"             # For local development
+    ],
+    allow_credentials=True,  # Allow credentials for authenticated requests
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
+    expose_headers=["Content-Type"],
     max_age=3600,
 )
-
-# Add OPTIONS handler for preflight requests
-@app.options("/{path:path}")
-async def options_handler(path: str):
-    return JSONResponse(
-        status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
-            "Access-Control-Allow-Headers": "*",
-            "Access-Control-Max-Age": "3600",
-        }
-    )
 
 # Add middleware for request logging
 @app.middleware("http")
