@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://textify-blog.onrender.com/api';
 
 export default function Blog(props) {
   const [blogs, setBlogs] = useState([]);
