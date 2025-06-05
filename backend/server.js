@@ -10,9 +10,13 @@ const app = express();
 app.use(cors({
   origin: ['https://textify-blog.vercel.app', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
+
+// Add pre-flight OPTIONS handler
+app.options('*', cors());
 
 // Middleware
 app.use(express.json());
