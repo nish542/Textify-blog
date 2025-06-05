@@ -229,7 +229,9 @@ export default function Blog(props) {
               )}
               
               <div className="mb-3">
-                <label htmlFor="author" className="form-label">
+                <label htmlFor="author" className="form-label" style={{
+                  color: props.mode === 'dark' ? '#282842' : '#212529'
+                }}>
                   <i className="fas fa-user me-1"></i>
                   Author (Optional)
                 </label>
@@ -243,16 +245,21 @@ export default function Blog(props) {
                   placeholder="Anonymous"
                   maxLength={50}
                   style={{
-                    backgroundColor: props.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.7)',
+                    backgroundColor: props.mode === 'dark' ? '#2a2a3a' : 'white',
                     border: '2px solid rgba(233, 236, 239, 0.5)',
                     borderRadius: '10px',
-                    color: props.mode === 'dark' ? 'white' : 'black',
+                    color: props.mode === 'dark' ? '#f5e6d3' : '#212529',
+                    '::placeholder': {
+                      color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
+                    }
                   }}
                 />
               </div>
 
               <div className="mb-3">
-                <label htmlFor="title" className="form-label">
+                <label htmlFor="title" className="form-label" style={{
+                  color: props.mode === 'dark' ? '#282842' : '#212529'
+                }}>
                   <i className="fas fa-heading me-1"></i>
                   Title *
                 </label>
@@ -267,19 +274,26 @@ export default function Blog(props) {
                   required
                   maxLength={200}
                   style={{
-                    backgroundColor: props.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.7)',
+                    backgroundColor: props.mode === 'dark' ? '#2a2a3a' : 'white',
                     border: '2px solid rgba(233, 236, 239, 0.5)',
                     borderRadius: '10px',
-                    color: props.mode === 'dark' ? 'white' : 'black',
+                    color: props.mode === 'dark' ? '#f5e6d3' : '#212529',
+                    '::placeholder': {
+                      color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
+                    }
                   }}
                 />
-                <small className="text-muted">
+                <small className="text-muted" style={{
+                  color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
+                }}>
                   {formData.title.length}/200 characters
                 </small>
               </div>
 
               <div className="mb-4">
-                <label htmlFor="content" className="form-label">
+                <label htmlFor="content" className="form-label" style={{
+                  color: props.mode === 'dark' ? '#282842' : '#212529'
+                }}>
                   <i className="fas fa-align-left me-1"></i>
                   Content *
                 </label>
@@ -294,13 +308,18 @@ export default function Blog(props) {
                   required
                   maxLength={5000}
                   style={{
-                    backgroundColor: props.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.7)',
+                    backgroundColor: props.mode === 'dark' ? '#2a2a3a' : 'white',
                     border: '2px solid rgba(233, 236, 239, 0.5)',
                     borderRadius: '10px',
-                    color: props.mode === 'dark' ? 'white' : 'black',
+                    color: props.mode === 'dark' ? '#f5e6d3' : '#212529',
+                    '::placeholder': {
+                      color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
+                    }
                   }}
                 />
-                <small className="text-muted">
+                <small className="text-muted" style={{
+                  color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
+                }}>
                   {formData.content.length}/5000 characters
                 </small>
               </div>
@@ -353,7 +372,7 @@ export default function Blog(props) {
                 transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                 borderRadius: '15px',
                 overflow: 'hidden',
-                backgroundColor: props.mode === 'dark' ? '#1a1a2e' : 'white'
+                backgroundColor: props.mode === 'dark' ? '#23233d' : 'white'
               }}>
                 <div className="card-body p-4">
                   <div className="d-flex justify-content-between align-items-start mb-3">
@@ -398,7 +417,7 @@ export default function Blog(props) {
                       <small className="text-muted" style={{
                         fontSize: '0.85rem',
                         fontWeight: '500',
-                        color: props.mode === 'dark' ? '#ffffff' : '#6c757d'
+                        color: props.mode === 'dark' ? 'white' : '#6c757d'
                       }}>
                         {blog.author}
                       </small>
@@ -406,7 +425,7 @@ export default function Blog(props) {
                     <small className="text-muted" style={{
                       fontSize: '0.85rem',
                       fontWeight: '500',
-                      color: props.mode === 'dark' ? '#ffffff' : '#6c757d'
+                      color: props.mode === 'dark' ? '#f7f5f5' : '#6c757d'
                     }}>
                       <i className="fas fa-clock me-1"></i>
                       {formatDate(blog.createdAt)}
