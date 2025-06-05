@@ -33,7 +33,7 @@ export default function About(props) {
                         }}
                     > 
                         <p className="text-center" style={{color: props.mode === 'dark' ? 'white' : 'black'}}>
-                            TextUtils is a versatile tool used to manipulate and analyze text data efficiently. It provides various features like changing the case of text (upper, lower, and title case), removing extra spaces, counting words and characters, and copying text. Designed to simplify text formatting and transformation, TextUtils is ideal for users who handle a lot of textual content, such as writers, developers, or editors. It supports real-time modifications, improving productivity and ease of use. Whether for writing clean code, preparing documents, or improving readability, TextUtils offers convenient solutions for managing text effortlessly.
+                            Textify is a versatile tool used to manipulate and analyze text data efficiently. It provides various features like changing the case of text (upper, lower, and title case), removing extra spaces, counting words and characters, and copying text. Designed to simplify text formatting and transformation, Textify is ideal for users who handle a lot of textual content, such as writers, developers, or editors. It supports real-time modifications, improving productivity and ease of use. Whether for writing clean code, preparing documents, or improving readability, Textify offers convenient solutions for managing text effortlessly.
                         </p>
                     </div>
                 </div>
@@ -48,7 +48,7 @@ export default function About(props) {
                     </h2>
                     <div id="collapseOne" className="accordion-collapse collapse show" data-bs-parent="#accordionExample">
                         <div className="accordion-body" style={myStyle}>
-                            Textutils gives you a way to analyze your text quickly and efficiently. Be it word count, character count or
+                            Textify gives you a way to analyze your text quickly and efficiently. Be it word count, character count or
                         </div>
                     </div>
                 </div>
@@ -60,7 +60,7 @@ export default function About(props) {
                     </h2>
                     <div id="collapseTwo" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
                         <div className="accordion-body" style={myStyle}>
-                            TextUtils is a free character counter tool that provides instant character count & word count statistics for a given text. Textutils reports the number of words and characters. Thus it is suitable for writing text with word/ character limit.
+                            Textify is a free character counter tool that provides instant character count & word count statistics for a given text. Textify reports the number of words and characters. Thus it is suitable for writing text with word/ character limit.
                         </div>
                     </div>
                 </div>

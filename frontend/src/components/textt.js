@@ -90,7 +90,11 @@ export default function TextSpace(props) {
     <div className="container py-4">
       <div className="text-center mb-4">
         <h3 className="display-5 fw-bold text-primary">{props.title}</h3>
-        <p className="text-muted" style={{color: props.mode === 'dark' ? 'white' : 'black'}}>
+        <p className="text-center" style={{
+          color: props.mode === 'dark' ? '#f5e6d3' : '#6c757d',
+          fontSize: '1.1rem',
+          marginBottom: '2rem'
+        }}>
           Transform your text with our powerful tools
         </p>
       </div>
