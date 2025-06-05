@@ -24,13 +24,24 @@ export default function Blog(props) {
   const fetchBlogs = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/blogs?page=${page}&limit=10`);
+      console.log('Fetching blogs from:', `${API_BASE_URL}/blogs?page=${page}&limit=10`);
+      const response = await fetch(`${API_BASE_URL}/blogs?page=${page}&limit=10`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors',
+        credentials: 'include'
+      });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch blogs');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch blogs');
       }
       
       const data = await response.json();
+      console.log('Received blogs data:', data);
       setBlogs(data.blogs);
       setCurrentPage(data.currentPage);
       setTotalPages(data.totalPages);
@@ -46,11 +57,25 @@ export default function Blog(props) {
   // Fetch statistics
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/blogs/stats`);
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
+      console.log('Fetching stats from:', `${API_BASE_URL}/blogs/stats`);
+      const response = await fetch(`${API_BASE_URL}/blogs/stats`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors',
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch stats');
       }
+      
+      const data = await response.json();
+      console.log('Received stats data:', data);
+      setStats(data);
     } catch (err) {
       console.error('Error fetching stats:', err);
     }

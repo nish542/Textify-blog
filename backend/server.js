@@ -17,6 +17,12 @@ app.use(cors({
 // Middleware
 app.use(express.json());
 
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
 // Rate limiting for blog posts
 const blogPostLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -29,7 +35,7 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// Blog Schema with TTL (Time To Live) for auto-deletion after 10 days
+// Blog Schema
 const blogSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -46,26 +52,20 @@ const blogSchema = new mongoose.Schema({
   author: {
     type: String,
     default: 'Anonymous',
-    trim: true,
-    maxlength: 50
+    trim: true
   },
   createdAt: {
     type: Date,
-    default: Date.now,
-    expires: 864000 // 10 days in seconds (10 * 24 * 60 * 60)
+    default: Date.now
   }
 });
 
-// Create TTL index for automatic deletion
-blogSchema.index({ createdAt: 1 }, { expireAfterSeconds: 864000 });
-
 const Blog = mongoose.model('Blog', blogSchema);
 
-// Routes
-
-// GET /api/blogs - Fetch all blogs (sorted by newest first)
+// GET /api/blogs - Get all blog posts with pagination
 app.get('/api/blogs', async (req, res) => {
   try {
+    console.log('Fetching blogs with params:', req.query);
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -73,20 +73,38 @@ app.get('/api/blogs', async (req, res) => {
     const blogs = await Blog.find()
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit)
-      .select('title content author createdAt');
+      .limit(limit);
 
     const total = await Blog.countDocuments();
+    const totalPages = Math.ceil(total / limit);
 
+    console.log(`Found ${blogs.length} blogs, total: ${total}, pages: ${totalPages}`);
     res.json({
       blogs,
       currentPage: page,
-      totalPages: Math.ceil(total / limit),
+      totalPages,
       total
     });
   } catch (error) {
     console.error('Error fetching blogs:', error);
     res.status(500).json({ error: 'Failed to fetch blogs' });
+  }
+});
+
+// GET /api/blogs/stats - Get blog statistics
+app.get('/api/blogs/stats', async (req, res) => {
+  try {
+    console.log('Fetching blog stats');
+    const total = await Blog.countDocuments();
+    const recent = await Blog.countDocuments({
+      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+    });
+
+    console.log(`Stats - Total: ${total}, Recent: ${recent}`);
+    res.json({ total, recent });
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: 'Failed to fetch statistics' });
   }
 });
 
@@ -142,33 +160,21 @@ app.post('/api/blogs', blogPostLimiter, async (req, res) => {
   }
 });
 
-// GET /api/blogs/stats - Get blog statistics
-app.get('/api/blogs/stats', async (req, res) => {
-  try {
-    const totalBlogs = await Blog.countDocuments();
-    const recentBlogs = await Blog.countDocuments({
-      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // last 24 hours
-    });
-
-    res.json({
-      total: totalBlogs,
-      recent: recentBlogs
-    });
-  } catch (error) {
-    console.error('Error fetching stats:', error);
-    res.status(500).json({ error: 'Failed to fetch statistics' });
-  }
-});
-
-// Health check
+// Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
-const PORT = 5001;  // Hardcoding to avoid port conflicts
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`CORS enabled for: ${['https://textify-blog.vercel.app', 'http://localhost:3000'].join(', ')}`);
 });
 
 module.exports = app;
