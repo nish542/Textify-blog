@@ -20,15 +20,15 @@ export default function Navbar(props) {
                             </a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="/about">
-                                <i className="fas fa-info-circle me-1"></i>
-                                About
-                            </a>
-                        </li>
-                        <li className="nav-item">
                             <a className="nav-link" href="/blogs">
                                 <i className="fas fa-blog me-1"></i>
                                 Blogs
+                            </a>
+                        </li>
+                        <li className="nav-item">
+                            <a className="nav-link" href="/about">
+                                <i className="fas fa-info-circle me-1"></i>
+                                About
                             </a>
                         </li>
                     </ul>

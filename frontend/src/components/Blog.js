@@ -441,8 +441,52 @@ export default function Blog(props) {
         <div className="row g-4">
           {blogs.map(blog => (
             <div key={blog._id} className="col-12 col-md-6 col-lg-4">
-              <div className="card shadow-sm border-0">
-                <div className="card-body p-4">
+              <div 
+                className="card border-0"
+                style={{
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                  cursor: 'pointer',
+                  backgroundColor: props.mode === 'dark' ? '#ccccec' : 'rgb(223, 213, 192)',
+                  borderRadius: '20px',
+                  overflow: 'hidden',
+                  
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.1)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+                }}
+              >
+                {blog.replies && blog.replies.length > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '15px',
+                    right: '15px',
+                    backgroundColor: '#0d6efd',
+                    color: 'white',
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.8rem',
+                    fontWeight: 'bold',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    zIndex: 1
+                  }}>
+                    {blog.replies.length}
+                  </div>
+                )}
+                <div className="card-body p-4" style={{
+                  transition: 'all 0.3s ease',
+                  backgroundColor: props.mode === 'dark' ? '#ccccec' : 'rgb(237, 230, 216)',
+                  borderRadius: '20px'
+                }}>
                   <h3 className="card-title mb-3">{blog.title}</h3>
                   <p className="card-text mb-3">{blog.content}</p>
                   <div className="d-flex justify-content-between align-items-center mb-3">
@@ -458,26 +502,21 @@ export default function Blog(props) {
                   
                   {/* Comment Icon and Reply Button */}
                   <div className="d-flex gap-2 align-items-center">
-                    {blog.replies && blog.replies.length > 0 && (
-                      <button
-                        className="btn btn-outline-primary btn-sm"
-                        onClick={() => toggleReplies(blog._id)}
-                        style={{
-                          borderRadius: '50%',
-                          width: '36px',
-                          height: '36px',
-                          padding: '0',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <i className="fas fa-comments"></i>
-                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.6rem' }}>
-                          {blog.replies.length}
-                        </span>
-                      </button>
-                    )}
+                    <button
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={() => toggleReplies(blog._id)}
+                      style={{
+                        borderRadius: '50%',
+                        width: '36px',
+                        height: '36px',
+                        padding: '0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <i className="fas fa-comments"></i>
+                    </button>
                     <button
                       className="btn btn-sm"
                       onClick={() => setReplyingTo(replyingTo === blog._id ? null : blog._id)}
@@ -677,7 +716,7 @@ const styles = `
   }
 
   .app-container.dark {
-    background-color: #0b0b15;
+    background-color: #19192c;
     color: white;
   }
 
