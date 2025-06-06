@@ -35,9 +35,17 @@ const blogPostLimiter = rateLimit({
 });
 
 // MongoDB connection
+console.log('MongoDB URI:', process.env.MONGODB_URI ? 'URI is set' : 'URI is not set');
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    console.error('Error details:', {
+      name: err.name,
+      message: err.message,
+      code: err.code
+    });
+  });
 
 // Blog Schema
 const blogSchema = new mongoose.Schema({
