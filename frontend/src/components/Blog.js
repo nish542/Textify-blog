@@ -20,6 +20,15 @@ export default function Blog(props) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
+  // Reply state
+  const [replyFormData, setReplyFormData] = useState({
+    content: '',
+    author: ''
+  });
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [submittingReply, setSubmittingReply] = useState(false);
+  const [replyError, setReplyError] = useState(null);
+
   // Fetch blogs
   const fetchBlogs = async (page = 1) => {
     try {
@@ -150,6 +159,61 @@ export default function Blog(props) {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle reply submission
+  const handleReplySubmit = async (e, blogId) => {
+    e.preventDefault();
+    
+    if (!replyFormData.content.trim()) {
+      setReplyError('Reply content is required');
+      return;
+    }
+
+    setSubmittingReply(true);
+    setReplyError(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/blogs/${blogId}/replies`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        mode: 'cors',
+        credentials: 'include',
+        body: JSON.stringify({
+          content: replyFormData.content.trim(),
+          author: replyFormData.author.trim() || 'Anonymous'
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add reply');
+      }
+      
+      // Reset form and refresh blogs
+      setReplyFormData({ content: '', author: '' });
+      setReplyingTo(null);
+      await fetchBlogs(currentPage);
+      
+    } catch (err) {
+      console.error('Error adding reply:', err);
+      setReplyError(err.message || 'Failed to add reply. Please try again.');
+    } finally {
+      setSubmittingReply(false);
+    }
+  };
+
+  // Handle reply form changes
+  const handleReplyInputChange = (e) => {
+    const { name, value } = e.target;
+    setReplyFormData(prev => ({
       ...prev,
       [name]: value
     }));
@@ -365,72 +429,114 @@ export default function Blog(props) {
           <p className="text-muted">Be the first to share your thoughts!</p>
         </div>
       ) : (
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div className="row g-4">
           {blogs.map(blog => (
-            <div key={blog._id} className="col">
-              <div className="card h-100 shadow-sm border-0 blog-card" style={{
-                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                borderRadius: '15px',
-                overflow: 'hidden',
-                backgroundColor: props.mode === 'dark' ? '#23233d' : 'white'
-              }}>
+            <div key={blog._id} className="col-12">
+              <div className="card shadow-sm border-0">
                 <div className="card-body p-4">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
-                    <h5 className="card-title text-primary mb-0" style={{
-                      fontSize: '1.25rem',
-                      fontWeight: '600',
-                      lineHeight: '1.4'
-                    }}>
-                      {blog.title}
-                    </h5>
-                  </div>
-                  <p className="card-text mb-4" style={{
-                    color: props.mode === 'dark' ? '#e0e0e0' : '#4a4a4a',
-                    display: '-webkit-box',
-                    WebkitLineClamp: '3',
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    fontSize: '0.95rem',
-                    lineHeight: '1.6'
-                  }}>
-                    {blog.content}
-                  </p>
-                </div>
-                <div className="card-footer bg-transparent border-0 p-4 pt-0">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="d-flex align-items-center">
-                      <div className="avatar-circle me-2" style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        backgroundColor: '#007bff',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        fontSize: '0.9rem',
-                        fontWeight: '600'
-                      }}>
-                        {blog.author.charAt(0).toUpperCase()}
-                      </div>
-                      <small className="text-muted" style={{
-                        fontSize: '0.85rem',
-                        fontWeight: '500',
-                        color: props.mode === 'dark' ? 'white' : '#6c757d'
-                      }}>
-                        {blog.author}
-                      </small>
-                    </div>
-                    <small className="text-muted" style={{
-                      fontSize: '0.85rem',
-                      fontWeight: '500',
-                      color: props.mode === 'dark' ? '#f7f5f5' : '#6c757d'
-                    }}>
+                  <h3 className="card-title mb-3">{blog.title}</h3>
+                  <p className="card-text mb-3">{blog.content}</p>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <small className="text-muted">
+                      <i className="fas fa-user me-1"></i>
+                      {blog.author}
+                    </small>
+                    <small className="text-muted">
                       <i className="fas fa-clock me-1"></i>
                       {formatDate(blog.createdAt)}
                     </small>
                   </div>
+                  
+                  {/* Reply Button */}
+                  <button
+                    className="btn btn-outline-primary btn-sm"
+                    onClick={() => setReplyingTo(replyingTo === blog._id ? null : blog._id)}
+                  >
+                    <i className="fas fa-reply me-1"></i>
+                    {replyingTo === blog._id ? 'Cancel Reply' : 'Reply'}
+                  </button>
+
+                  {/* Reply Form */}
+                  {replyingTo === blog._id && (
+                    <div className="mt-3">
+                      <form onSubmit={(e) => handleReplySubmit(e, blog._id)}>
+                        {replyError && (
+                          <div className="alert alert-danger" role="alert">
+                            <i className="fas fa-exclamation-circle me-2"></i>
+                            {replyError}
+                          </div>
+                        )}
+                        
+                        <div className="mb-2">
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            name="author"
+                            value={replyFormData.author}
+                            onChange={handleReplyInputChange}
+                            placeholder="Your name (optional)"
+                            maxLength={50}
+                          />
+                        </div>
+                        <div className="mb-2">
+                          <textarea
+                            className="form-control form-control-sm"
+                            name="content"
+                            value={replyFormData.content}
+                            onChange={handleReplyInputChange}
+                            placeholder="Write your reply..."
+                            rows="2"
+                            maxLength={1000}
+                            required
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          className="btn btn-primary btn-sm"
+                          disabled={submittingReply}
+                        >
+                          {submittingReply ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                              Posting...
+                            </>
+                          ) : (
+                            <>
+                              <i className="fas fa-paper-plane me-1"></i>
+                              Post Reply
+                            </>
+                          )}
+                        </button>
+                      </form>
+                    </div>
+                  )}
+
+                  {/* Replies List */}
+                  {blog.replies && blog.replies.length > 0 && (
+                    <div className="mt-3">
+                      <h6 className="mb-2">
+                        <i className="fas fa-comments me-1"></i>
+                        Replies ({blog.replies.length})
+                      </h6>
+                      <div className="replies-list">
+                        {blog.replies.map((reply, index) => (
+                          <div key={index} className="reply-item p-2 border-start border-2 border-primary ms-3 mb-2">
+                            <p className="mb-1">{reply.content}</p>
+                            <div className="d-flex justify-content-between align-items-center">
+                              <small className="text-muted">
+                                <i className="fas fa-user me-1"></i>
+                                {reply.author}
+                              </small>
+                              <small className="text-muted">
+                                <i className="fas fa-clock me-1"></i>
+                                {formatDate(reply.createdAt)}
+                              </small>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -62,9 +62,26 @@ const blogSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
     expires: 864000
-  }
+  },
+  replies: [{
+    content: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 1000
+    },
+    author: {
+      type: String,
+      default: 'Anonymous',
+      trim: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 });
-
+  
 const Blog = mongoose.model('Blog', blogSchema);
 
 // GET /api/blogs - Get all blog posts with pagination
@@ -162,6 +179,70 @@ app.post('/api/blogs', blogPostLimiter, async (req, res) => {
       error: 'Failed to create blog post',
       details: error.message 
     });
+  }
+});
+
+// POST /api/blogs/:id/replies - Add a reply to a blog post
+app.post('/api/blogs/:id/replies', async (req, res) => {
+  try {
+    console.log('Received reply request for blog:', req.params.id);
+    console.log('Reply data:', req.body);
+    
+    const { content, author } = req.body;
+    const blogId = req.params.id;
+
+    if (!content) {
+      console.log('Validation failed: Missing reply content');
+      return res.status(400).json({ error: 'Reply content is required' });
+    }
+
+    if (content.length > 1000) {
+      console.log('Validation failed: Reply too long');
+      return res.status(400).json({ error: 'Reply must be less than 1000 characters' });
+    }
+
+    const blog = await Blog.findById(blogId);
+    if (!blog) {
+      console.log('Blog not found:', blogId);
+      return res.status(404).json({ error: 'Blog post not found' });
+    }
+
+    const reply = {
+      content: content.trim(),
+      author: author?.trim() || 'Anonymous',
+      createdAt: new Date()
+    };
+
+    console.log('Adding reply to blog:', reply);
+    blog.replies.push(reply);
+    await blog.save();
+    console.log('Reply added successfully');
+
+    res.status(201).json({
+      message: 'Reply added successfully',
+      reply: reply
+    });
+  } catch (error) {
+    console.error('Error adding reply:', error);
+    res.status(500).json({ error: 'Failed to add reply' });
+  }
+});
+
+// GET /api/blogs/:id/replies - Get all replies for a blog post
+app.get('/api/blogs/:id/replies', async (req, res) => {
+  try {
+    console.log('Fetching replies for blog:', req.params.id);
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) {
+      console.log('Blog not found:', req.params.id);
+      return res.status(404).json({ error: 'Blog post not found' });
+    }
+
+    console.log(`Found ${blog.replies.length} replies`);
+    res.json(blog.replies);
+  } catch (error) {
+    console.error('Error fetching replies:', error);
+    res.status(500).json({ error: 'Failed to fetch replies' });
   }
 });
 
