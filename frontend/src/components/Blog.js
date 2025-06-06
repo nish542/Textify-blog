@@ -28,6 +28,7 @@ export default function Blog(props) {
   const [replyingTo, setReplyingTo] = useState(null);
   const [submittingReply, setSubmittingReply] = useState(false);
   const [replyError, setReplyError] = useState(null);
+  const [expandedReplies, setExpandedReplies] = useState({});
 
   // Fetch blogs
   const fetchBlogs = async (page = 1) => {
@@ -231,6 +232,14 @@ export default function Blog(props) {
     });
   };
 
+  // Toggle replies visibility
+  const toggleReplies = (blogId) => {
+    setExpandedReplies(prev => ({
+      ...prev,
+      [blogId]: !prev[blogId]
+    }));
+  };
+
   return (
     <div className={`container py-4 ${props.mode === 'dark' ? 'app-container dark' : 'app-container light'}`}>
       {/* Header */}
@@ -431,7 +440,7 @@ export default function Blog(props) {
       ) : (
         <div className="row g-4">
           {blogs.map(blog => (
-            <div key={blog._id} className="col-12">
+            <div key={blog._id} className="col-12 col-md-6 col-lg-4">
               <div className="card shadow-sm border-0">
                 <div className="card-body p-4">
                   <h3 className="card-title mb-3">{blog.title}</h3>
@@ -447,14 +456,59 @@ export default function Blog(props) {
                     </small>
                   </div>
                   
-                  {/* Reply Button */}
-                  <button
-                    className="btn btn-outline-primary btn-sm"
-                    onClick={() => setReplyingTo(replyingTo === blog._id ? null : blog._id)}
-                  >
-                    <i className="fas fa-reply me-1"></i>
-                    {replyingTo === blog._id ? 'Cancel Reply' : 'Reply'}
-                  </button>
+                  {/* Comment Icon and Reply Button */}
+                  <div className="d-flex gap-2 align-items-center">
+                    {blog.replies && blog.replies.length > 0 && (
+                      <button
+                        className="btn btn-outline-primary btn-sm"
+                        onClick={() => toggleReplies(blog._id)}
+                        style={{
+                          borderRadius: '50%',
+                          width: '36px',
+                          height: '36px',
+                          padding: '0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <i className="fas fa-comments"></i>
+                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.6rem' }}>
+                          {blog.replies.length}
+                        </span>
+                      </button>
+                    )}
+                    <button
+                      className="btn btn-sm"
+                      onClick={() => setReplyingTo(replyingTo === blog._id ? null : blog._id)}
+                      style={{
+                        backgroundColor: replyingTo === blog._id ? '#dc3545' : '#0d6efd',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '20px',
+                        padding: '8px 20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        transition: 'all 0.3s ease',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        fontWeight: '500'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                        e.currentTarget.style.backgroundColor = replyingTo === blog._id ? '#c82333' : '#0b5ed7';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                        e.currentTarget.style.backgroundColor = replyingTo === blog._id ? '#dc3545' : '#0d6efd';
+                      }}
+                    >
+                      <i className={`fas ${replyingTo === blog._id ? 'fa-times' : 'fa-reply'}`} style={{ fontSize: '0.9rem' }}></i>
+                      {replyingTo === blog._id ? 'Cancel Reply' : 'Reply'}
+                    </button>
+                  </div>
 
                   {/* Reply Form */}
                   {replyingTo === blog._id && (
@@ -512,7 +566,7 @@ export default function Blog(props) {
                   )}
 
                   {/* Replies List */}
-                  {blog.replies && blog.replies.length > 0 && (
+                  {blog.replies && blog.replies.length > 0 && expandedReplies[blog._id] && (
                     <div className="mt-3">
                       <h6 className="mb-2">
                         <i className="fas fa-comments me-1"></i>
