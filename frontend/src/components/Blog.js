@@ -241,7 +241,7 @@ export default function Blog(props) {
   };
 
   return (
-    <div className={`container py-4 ${props.mode === 'dark' ? 'app-container dark' : 'app-container light'}`}>
+    <div className={`container py-4 ${props.mode === 'dark' ? 'app-container dark' : 'app-container light'}`} >
       {/* Header */}
       <div className="text-center mb-5">
         <h2 className="display-5 fw-bold text-primary mb-3">Community Blogs</h2>
@@ -318,10 +318,10 @@ export default function Blog(props) {
                   placeholder="Anonymous"
                   maxLength={50}
                   style={{
-                    backgroundColor: props.mode === 'dark' ? '#2a2a3a' : 'white',
+                    backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'white',
                     border: '2px solid rgba(233, 236, 239, 0.5)',
                     borderRadius: '10px',
-                    color: props.mode === 'dark' ? '#f5e6d3' : '#212529',
+                    color: props.mode === 'dark' ? 'black' : '#212529',
                     '::placeholder': {
                       color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
                     }
@@ -347,10 +347,10 @@ export default function Blog(props) {
                   required
                   maxLength={200}
                   style={{
-                    backgroundColor: props.mode === 'dark' ? '#2a2a3a' : 'white',
+                    backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'white',
                     border: '2px solid rgba(233, 236, 239, 0.5)',
                     borderRadius: '10px',
-                    color: props.mode === 'dark' ? '#f5e6d3' : '#212529',
+                    color: props.mode === 'dark' ? 'black' : '#212529',
                     '::placeholder': {
                       color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
                     }
@@ -381,10 +381,10 @@ export default function Blog(props) {
                   required
                   maxLength={5000}
                   style={{
-                    backgroundColor: props.mode === 'dark' ? '#2a2a3a' : 'white',
+                    backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'white',
                     border: '2px solid rgba(233, 236, 239, 0.5)',
                     borderRadius: '10px',
-                    color: props.mode === 'dark' ? '#f5e6d3' : '#212529',
+                    color: props.mode === 'dark' ? 'black' : '#212529',
                     '::placeholder': {
                       color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
                     }

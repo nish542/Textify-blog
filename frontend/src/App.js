@@ -5,6 +5,7 @@ import TextSpace from './components/textt.js';
 import About from './components/About.js';
 import Blog from './components/Blog.js';
 import Alert from './components/Alert.js';
+import Home from './components/Home';
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 
 function App() {
@@ -49,8 +50,12 @@ function App() {
 
   const router = createBrowserRouter([
     {
-      path: '/', 
-      element: <TextSpace title="Enter text" Text="Enter text here" mode={mode} showAlert={showAlert} /> 
+      path: '/',
+      element: <Home />
+    },
+    {
+      path: '/edit',
+      element: <TextSpace title="Enter text" Text="Enter text here" mode={mode} showAlert={showAlert} />
     },
     {
       path: '/about',
@@ -63,13 +68,62 @@ function App() {
   ]);
   
   return (
-    <div className={`app-container ${mode}`}>
+    <div className={`app-container ${mode}`} style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+      {/* Abstract background shapes for the whole app */}
+      <div style={{
+        position: 'absolute',
+        top: 'max(-60px, -10vw)',
+        left: 'max(-60px, -10vw)',
+        width: 'min(180px, 40vw)',
+        height: 'min(180px, 40vw)',
+        background: 'radial-gradient(circle, #ffe5d0 60%, #fff0 100%)',
+        borderRadius: '50%',
+        zIndex: 0,
+        opacity: mode === 'dark' ? 0.2 : 0.7,
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: 'max(-80px, -10vw)',
+        left: 'max(-40px, -10vw)',
+        width: 'min(120px, 30vw)',
+        height: 'min(120px, 30vw)',
+        background: 'radial-gradient(circle, #ffd6d6 60%, #fff0 100%)',
+        borderRadius: '50%',
+        zIndex: 0,
+        opacity: mode === 'dark' ? 0.15 : 0.6,
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        top: '40%',
+        right: 'max(-60px, -10vw)',
+        width: 'min(140px, 30vw)',
+        height: 'min(140px, 30vw)',
+        background: 'radial-gradient(circle, #f7e6c4 60%, #fff0 100%)',
+        borderRadius: '50%',
+        zIndex: 0,
+        opacity: mode === 'dark' ? 0.18 : 0.7,
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '20px',
+        right: '20px',
+        width: 'min(80px, 18vw)',
+        height: 'min(80px, 18vw)',
+        background: 'radial-gradient(circle, #ffe5d0 60%, #fff0 100%)',
+        borderRadius: '50%',
+        zIndex: 0,
+        opacity: mode === 'dark' ? 0.12 : 0.5,
+        pointerEvents: 'none'
+      }} />
       <Navbar title="Textify" mode={mode} toggleMode={toggleMode}/>
       <div className='cont my-4 mx-5'>
         <Alert alert={alert} />
       </div>
-      <div className="container my-4">
-        <RouterProvider router={router} />   
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <RouterProvider router={router} />
       </div>
     </div>
   );
