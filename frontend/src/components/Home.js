@@ -100,6 +100,8 @@ export default function Home(props) {
       <div style={{
         marginTop: '2rem',
         marginBottom: '2.5rem',
+        marginLeft:'1.5rem',
+        marginRight:'1.5rem',
         textAlign: 'center',
         color: isDark ? '#f7e8cb' : '#2d2d38',
         fontSize: '1.25rem',
