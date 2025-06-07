@@ -100,7 +100,7 @@ export default function Blog(props) {
   useEffect(() => {
     const container = document.querySelector('.container');
     if (container) {
-      container.className = `container py-4 ${props.mode === 'dark' ? 'app-container dark' : 'app-container light'}`;
+      container.className = `container py-4`;
     }
   }, [props.mode]);
 
@@ -241,7 +241,7 @@ export default function Blog(props) {
   };
 
   return (
-    <div className={`container py-4 ${props.mode === 'dark' ? 'app-container dark' : 'app-container light'}`} >
+    <div className={`container py-4 `} >
       {/* Header */}
       <div className="text-center mb-5">
         <h2 className="display-5 fw-bold text-primary mb-3">Community Blogs</h2>

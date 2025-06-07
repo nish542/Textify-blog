@@ -51,7 +51,7 @@ function App() {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Home />
+      element: <Home mode={mode} />
     },
     {
       path: '/edit',

@@ -80,10 +80,10 @@ export default function About(props) {
                 </div>
             </div>
 
-            <div className="container-fluid px-0 py-5">
+            <div className="container-fluid px-0 py-5" >
                 <div className="row g-0">
                     <div className="col-12">
-                        <div className="text-center p-3 rounded-0 shadow" 
+                        <div className="text-center p-3 rounded-4 shadow" 
                             style={{
                                 backgroundColor: 'rgba(242, 236, 224, 0.4)',
                                 border: '2px solid rgb(197 184 154)',

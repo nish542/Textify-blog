@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default function TextSpace(props) {
@@ -83,8 +83,7 @@ export default function TextSpace(props) {
       setTranslating(false);
     }
   };
-
-  const previewText = text; // Changed to always show original text
+ // Changed to always show original text
 
   return (
     <div className="container py-4">
@@ -107,14 +106,36 @@ export default function TextSpace(props) {
           onChange={handleOnChange}
           placeholder="Enter your text here..."
           style={{ 
-            backgroundColor: props.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.7)',
+            backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'rgba(255, 255, 255, 0.7)',
             border: '2px solid rgba(233, 236, 239, 0.5)',
             borderRadius: '10px',
             transition: 'all 0.3s ease',
             color: props.mode === 'dark' ? 'white' : 'black',
-            backdropFilter: 'blur(5px)'
+            backdropFilter: 'blur(5px)',
+            transform: 'scale(1)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+            animation: text ? 'pulse 0.5s ease-in-out' : 'none'
+          }}
+          onFocus={e => {
+            e.currentTarget.style.transform = 'scale(1.01)';
+            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+            e.currentTarget.style.borderColor = 'rgba(13, 110, 253, 0.5)';
+          }}
+          onBlur={e => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+            e.currentTarget.style.borderColor = 'rgba(233, 236, 239, 0.5)';
           }}
         />
+        <style>
+          {`
+            @keyframes pulse {
+              0% { transform: scale(1); }
+              50% { transform: scale(1.01); }
+              100% { transform: scale(1); }
+            }
+          `}
+        </style>
       </div>
 
       {/* Action Buttons */}
@@ -124,7 +145,25 @@ export default function TextSpace(props) {
             className="btn btn-primary" 
             disabled={!text} 
             onClick={handleUpClick}
-            style={{ transition: 'all 0.3s ease' }}
+            style={{ 
+              transition: 'all 0.3s ease',
+              transform: 'translateY(0)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              ':hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+              }
+            }}
+            onMouseOver={e => {
+              if (!e.currentTarget.disabled) {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+              }
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            }}
           >
             <i className="fas fa-arrow-up me-1"></i> Uppercase
           </button>
@@ -132,7 +171,21 @@ export default function TextSpace(props) {
             className="btn btn-primary" 
             disabled={!text} 
             onClick={handleLoClick}
-            style={{ transition: 'all 0.3s ease' }}
+            style={{ 
+              transition: 'all 0.3s ease',
+              transform: 'translateY(0)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+            onMouseOver={e => {
+              if (!e.currentTarget.disabled) {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+              }
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            }}
           >
             <i className="fas fa-arrow-down me-1"></i> Lowercase
           </button>
@@ -140,7 +193,21 @@ export default function TextSpace(props) {
             className="btn btn-secondary" 
             disabled={!text} 
             onClick={handleSpace}
-            style={{ transition: 'all 0.3s ease' }}
+            style={{ 
+              transition: 'all 0.3s ease',
+              transform: 'translateY(0)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+            onMouseOver={e => {
+              if (!e.currentTarget.disabled) {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+              }
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            }}
           >
             <i className="fas fa-compress-alt me-1"></i> Remove Spaces
           </button>
@@ -148,7 +215,21 @@ export default function TextSpace(props) {
             className="btn btn-secondary" 
             disabled={!text} 
             onClick={handleClear}
-            style={{ transition: 'all 0.3s ease' }}
+            style={{ 
+              transition: 'all 0.3s ease',
+              transform: 'translateY(0)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+            onMouseOver={e => {
+              if (!e.currentTarget.disabled) {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+              }
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            }}
           >
             <i className="fas fa-trash me-1"></i> Clear
           </button>
@@ -156,7 +237,21 @@ export default function TextSpace(props) {
             className="btn btn-success" 
             disabled={!text || loading} 
             onClick={correctGrammar}
-            style={{ transition: 'all 0.3s ease' }}
+            style={{ 
+              transition: 'all 0.3s ease',
+              transform: 'translateY(0)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+            onMouseOver={e => {
+              if (!e.currentTarget.disabled) {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+              }
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            }}
           >
             <i className="fas fa-spell-check me-1"></i>
             {loading ? "Correcting..." : "Correct Grammar"}
@@ -174,11 +269,11 @@ export default function TextSpace(props) {
               value={toLang}
               onChange={(e) => setToLang(e.target.value)}
               style={{ 
-                backgroundColor: props.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.7)',
+                backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'rgba(255, 255, 255, 0.7)',
                 border: '2px solid rgba(233, 236, 239, 0.5)',
                 borderRadius: '10px',
                 transition: 'all 0.3s ease',
-                color: props.mode === 'dark' ? 'white' : 'black',
+                color: props.mode === 'dark' ? '#4e4e59' : 'black',
                 backdropFilter: 'blur(5px)'
               }}
             >
