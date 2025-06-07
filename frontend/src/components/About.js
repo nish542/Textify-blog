@@ -32,8 +32,12 @@ export default function About(props) {
                             height: '100%'
                         }}
                     > 
-                        <p className="text-center" style={{color: props.mode === 'dark' ? 'white' : 'black'}}>
-                            Textify is a versatile tool used to manipulate and analyze text data efficiently. It provides various features like changing the case of text (upper, lower, and title case), removing extra spaces, counting words and characters, and copying text. Designed to simplify text formatting and transformation, Textify is ideal for users who handle a lot of textual content, such as writers, developers, or editors. It supports real-time modifications, improving productivity and ease of use. Whether for writing clean code, preparing documents, or improving readability, Textify offers convenient solutions for managing text effortlessly.
+                        <p className="mb-0 text-justify" style={{
+                            color: props.mode === 'dark' ? 'white' : 'black',
+                            textAlign: 'justify',
+                            textJustify: 'inter-word'
+                        }}>
+                            Textify is a modern web-based platform that allows users to write, edit, and share content effortlessly in a clean and focused environment. It offers two core features: a powerful text manipulation tool for formatting, cleaning, and enhancing written content, and an anonymous blogging section where users can post their thoughts without creating an account. Each blog post remains live for 10 days before being automatically deleted, ensuring simplicity and privacy. Designed for writers, thinkers, and everyday users, Textify eliminates distractions and unnecessary steps, making it easy to express ideas freely and intelligently.
                         </p>
                     </div>
                 </div>
@@ -47,9 +51,8 @@ export default function About(props) {
                         </button>
                     </h2>
                     <div id="collapseOne" className="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                        <div className="accordion-body" style={myStyle}>
-                            Textify gives you a way to analyze your text quickly and efficiently. Be it word count, character count or
-                        </div>
+                        <div className="accordion-body text-justify" style={myStyle}>
+                        The Text Manipulation feature in Textify helps you clean, format, and enhance your text with ease. Whether you're fixing grammar, changing case, removing extra spaces, or translating content, Textify offers quick, efficient tools to make your writing sharp and polished — all in a single click, without needing external software.                        </div>
                     </div>
                 </div>
                 <div className="accordion-item">
@@ -59,7 +62,7 @@ export default function About(props) {
                         </button>
                     </h2>
                     <div id="collapseTwo" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                        <div className="accordion-body" style={myStyle}>
+                        <div className="accordion-body text-justify" style={myStyle}>
                             Textify is a free character counter tool that provides instant character count & word count statistics for a given text. Textify reports the number of words and characters. Thus it is suitable for writing text with word/ character limit.
                         </div>
                     </div>
@@ -67,12 +70,47 @@ export default function About(props) {
                 <div className="accordion-item">
                     <h2 className="accordion-header">
                         <button className="accordion-button collapsed" style={myStyle} type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                            <strong>Browser Compatibility</strong>
+                            <strong>Share Freely, Stay Anonymous</strong>
                         </button>
                     </h2>
                     <div id="collapseThree" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                        <div className="accordion-body" style={myStyle}>
-                            This word counter software works in any web browsers such as Chrome, Firefox, Internet Explorer, Safari, Opera. It suits to count characters in facebook, blog, books, excel document, pdf document, essays, etc.
+                        <div className="accordion-body text-justify" style={myStyle}>
+                        The Blog feature on Textify lets anyone post their thoughts anonymously without needing to sign up. Each blog is visible to everyone and stays live for 10 days before being automatically deleted, keeping the platform clean, simple, and focused on fresh content.                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="container-fluid px-0 py-5">
+                <div className="row g-0">
+                    <div className="col-12">
+                        <div className="text-center p-3 rounded-0 shadow" 
+                            style={{
+                                backgroundColor: 'rgba(242, 236, 224, 0.4)',
+                                border: '2px solid rgb(197 184 154)',
+                            }}
+                        >
+                            <h3 className="mb-3 text-center" style={{color: props.mode === 'dark' ? 'white' : 'black'}}>Created By</h3>
+                            <div className="row align-items-center justify-content-center">
+                                <div className="col-md-6 mb-3 mb-md-0">
+                                    <img 
+                                        src="/Nishant_picture.png" 
+                                        alt="Nishant Anand" 
+                                        className="img-fluid rounded-4 shadow"
+                                        style={{
+                                            width: '100%',
+                                            maxWidth: '200px',
+                                            border: '6px solid',
+                                            borderColor: '#ebdeb0'
+                                        }}
+                                    />
+                                </div>
+                                <div className="col-md-6 text-start">
+                                    <h4 className="mb-2" style={{color: props.mode === 'dark' ? 'white' : 'black'}}>Nishant Anand</h4>
+                                    <p className="mb-0 text-justify" style={{color: props.mode === 'dark' ? 'white' : 'black'}}>
+                                        The creator and developer behind Textify, bringing together modern design and powerful functionality.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
