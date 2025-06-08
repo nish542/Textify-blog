@@ -6,6 +6,7 @@ import About from './components/About.js';
 import Blog from './components/Blog.js';
 import Alert from './components/Alert.js';
 import Home from './components/Home';
+import { Analytics } from "@vercel/analytics/react";
 import {createBrowserRouter, RouterProvider, useLocation} from 'react-router-dom';
 
 // Create a wrapper component to handle scroll restoration
@@ -80,6 +81,7 @@ function App() {
   
   return (
     <div className={`app-container ${mode}`} style={{ minHeight: '100vh', position: 'relative' }}>
+      <Analytics />
       {/* Abstract background shapes for the whole app */}
       <div style={{
         position: 'fixed',
