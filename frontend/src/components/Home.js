@@ -1,10 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaPen, FaBookOpen, FaInfoCircle, FaArrowRight, FaRegStar, FaPlus } from 'react-icons/fa';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 
 export default function Home(props) {
   const navigate = useNavigate();
   const isDark = props.mode === 'dark';
+  useScrollToTop();
+  
   return (
     <div style={{
       minHeight: '2vh',

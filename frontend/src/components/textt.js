@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { useScrollToTop } from '../hooks/useScrollToTop';
 
 export default function TextSpace(props) {
+  useScrollToTop();
   const [text, setText] = useState("");
   const [correctedText, setCorrectedText] = useState("");
   const [translatedText, setTranslatedText] = useState("");

@@ -1,10 +1,36 @@
 import React from 'react'
+import { useScrollToTop } from '../hooks/useScrollToTop';
+import { FaLinkedin, FaGithub, FaInstagram, FaEnvelope } from 'react-icons/fa';
 
 export default function About(props) {
+    useScrollToTop();
     let myStyle = {
         backgroundColor: props.mode === 'dark' ? '#22262b' : 'rgb(246 241 230)',
         color: props.mode === 'dark' ? 'white' : 'black'
     }
+
+    const socialLinks = [
+        {
+            icon: <FaLinkedin size={24} />,
+            url: 'https://www.linkedin.com/in/nishant-anand-75b544325/',
+            label: 'LinkedIn'
+        },
+        {
+            icon: <FaGithub size={24} />,
+            url: 'https://github.com/nish542',
+            label: 'GitHub'
+        },
+        {
+            icon: <FaInstagram size={24} />,
+            url: 'https://www.instagram.com/_nish.ant_._/',
+            label: 'Instagram'
+        },
+        {
+            icon: <FaEnvelope size={24} />,
+            url: 'mailto:nishant.anand542@gmail.com',
+            label: 'Email'
+        }
+    ];
 
     return (
         <div className="container py-4">
@@ -103,6 +129,35 @@ export default function About(props) {
                                             borderColor: '#ebdeb0'
                                         }}
                                     />
+                                    <div className="mt-3 d-flex justify-content-center gap-3">
+                                        {socialLinks.map((link, index) => (
+                                            <a
+                                                key={index}
+                                                href={link.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-decoration-none"
+                                                style={{
+                                                    color: props.mode === 'dark' ? '#f5e6d3' : '#6c757d',
+                                                    transition: 'all 0.3s ease',
+                                                    padding: '8px',
+                                                    borderRadius: '50%',
+                                                    backgroundColor: props.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                                                }}
+                                                onMouseOver={e => {
+                                                    e.currentTarget.style.transform = 'translateY(-3px)';
+                                                    e.currentTarget.style.color = props.mode === 'dark' ? '#ffb347' : '#ff9800';
+                                                }}
+                                                onMouseOut={e => {
+                                                    e.currentTarget.style.transform = 'none';
+                                                    e.currentTarget.style.color = props.mode === 'dark' ? '#f5e6d3' : '#6c757d';
+                                                }}
+                                                title={link.label}
+                                            >
+                                                {link.icon}
+                                            </a>
+                                        ))}
+                                    </div>
                                 </div>
                                 <div className="col-md-6 text-start">
                                     <h4 className="mb-2" style={{color: props.mode === 'dark' ? 'white' : 'black'}}>Nishant Anand</h4>

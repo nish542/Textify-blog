@@ -6,7 +6,18 @@ import About from './components/About.js';
 import Blog from './components/Blog.js';
 import Alert from './components/Alert.js';
 import Home from './components/Home';
-import {createBrowserRouter, RouterProvider} from 'react-router-dom';
+import {createBrowserRouter, RouterProvider, useLocation} from 'react-router-dom';
+
+// Create a wrapper component to handle scroll restoration
+function ScrollToTopWrapper({ children }) {
+  const location = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  return children;
+}
 
 function App() {
   const [mode, setMode] = useState(() => {
@@ -51,78 +62,90 @@ function App() {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Home mode={mode} />
+      element: <ScrollToTopWrapper><Home mode={mode} /></ScrollToTopWrapper>
     },
     {
       path: '/edit',
-      element: <TextSpace title="Enter text" Text="Enter text here" mode={mode} showAlert={showAlert} />
+      element: <ScrollToTopWrapper><TextSpace title="Enter text" Text="Enter text here" mode={mode} showAlert={showAlert} /></ScrollToTopWrapper>
     },
     {
       path: '/about',
-      element: <About mode={mode} />
+      element: <ScrollToTopWrapper><About mode={mode} /></ScrollToTopWrapper>
     },
     {
       path: '/blogs',
-      element: <Blog mode={mode} showAlert={showAlert} />
+      element: <ScrollToTopWrapper><Blog mode={mode} showAlert={showAlert} /></ScrollToTopWrapper>
     }
   ]);
   
   return (
-    <div className={`app-container ${mode}`} style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <div className={`app-container ${mode}`} style={{ minHeight: '100vh', position: 'relative' }}>
       {/* Abstract background shapes for the whole app */}
       <div style={{
-        position: 'absolute',
-        top: 'max(-60px, -10vw)',
-        left: 'max(-60px, -10vw)',
-        width: 'min(180px, 40vw)',
-        height: 'min(180px, 40vw)',
-        background: 'radial-gradient(circle, #ffe5d0 60%, #fff0 100%)',
-        borderRadius: '50%',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         zIndex: 0,
-        opacity: mode === 'dark' ? 0.2 : 0.7,
         pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: 'max(-80px, -10vw)',
-        left: 'max(-40px, -10vw)',
-        width: 'min(120px, 30vw)',
-        height: 'min(120px, 30vw)',
-        background: 'radial-gradient(circle, #ffd6d6 60%, #fff0 100%)',
-        borderRadius: '50%',
-        zIndex: 0,
-        opacity: mode === 'dark' ? 0.15 : 0.6,
-        pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        top: '40%',
-        right: 'max(-60px, -10vw)',
-        width: 'min(140px, 30vw)',
-        height: 'min(140px, 30vw)',
-        background: 'radial-gradient(circle, #f7e6c4 60%, #fff0 100%)',
-        borderRadius: '50%',
-        zIndex: 0,
-        opacity: mode === 'dark' ? 0.18 : 0.7,
-        pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '20px',
-        right: '20px',
-        width: 'min(80px, 18vw)',
-        height: 'min(80px, 18vw)',
-        background: 'radial-gradient(circle, #ffe5d0 60%, #fff0 100%)',
-        borderRadius: '50%',
-        zIndex: 0,
-        opacity: mode === 'dark' ? 0.12 : 0.5,
-        pointerEvents: 'none'
-      }} />
-      <Navbar title="Textify" mode={mode} toggleMode={toggleMode}/>
-      <div className='cont my-4 mx-5'>
-        <Alert alert={alert} />
+      }}>
+        <div style={{
+          position: 'absolute',
+          top: 'max(-60px, -10vw)',
+          left: 'max(-60px, -10vw)',
+          width: 'min(180px, 40vw)',
+          height: 'min(180px, 40vw)',
+          background: 'radial-gradient(circle, #ffe5d0 60%, #fff0 100%)',
+          borderRadius: '50%',
+          opacity: mode === 'dark' ? 0.2 : 0.7,
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: 'max(-80px, -10vw)',
+          left: 'max(-40px, -10vw)',
+          width: 'min(120px, 30vw)',
+          height: 'min(120px, 30vw)',
+          background: 'radial-gradient(circle, #ffd6d6 60%, #fff0 100%)',
+          borderRadius: '50%',
+          opacity: mode === 'dark' ? 0.15 : 0.6,
+        }} />
+        <div style={{
+          position: 'absolute',
+          top: '40%',
+          right: 'max(-60px, -10vw)',
+          width: 'min(140px, 30vw)',
+          height: 'min(140px, 30vw)',
+          background: 'radial-gradient(circle, #f7e6c4 60%, #fff0 100%)',
+          borderRadius: '50%',
+          opacity: mode === 'dark' ? 0.18 : 0.7,
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '20px',
+          right: '20px',
+          width: 'min(80px, 18vw)',
+          height: 'min(80px, 18vw)',
+          background: 'radial-gradient(circle, #ffe5d0 60%, #fff0 100%)',
+          borderRadius: '50%',
+          opacity: mode === 'dark' ? 0.12 : 0.5,
+        }} />
       </div>
-      <div style={{ position: 'relative', zIndex: 1 }}>
+
+      {/* Fixed navbar at the top */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000 }}>
+        <Navbar title="Textify" mode={mode} toggleMode={toggleMode}/>
+        <div className='cont mx-5'>
+          <Alert alert={alert} />
+        </div>
+      </div>
+
+      {/* Main content with padding for fixed navbar */}
+      <div style={{ 
+        paddingTop: '120px', // Adjust this value based on your navbar height
+        position: 'relative',
+        zIndex: 1
+      }}>
         <RouterProvider router={router} />
       </div>
     </div>

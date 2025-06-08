@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 
 const API_BASE_URL = 'https://textify-blog.onrender.com/api';
 
 export default function Blog(props) {
+  useScrollToTop();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
