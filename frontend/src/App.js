@@ -142,7 +142,7 @@ function App() {
 
       {/* Main content with padding for fixed navbar */}
       <div style={{ 
-        paddingTop: '60px', // Adjust this value based on your navbar height
+        paddingTop: '70px', // Adjust this value based on your navbar height
         position: 'relative',
         zIndex: 1
       }}>

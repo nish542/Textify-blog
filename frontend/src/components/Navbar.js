@@ -1,8 +1,30 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export default function Navbar(props) {
+    const navbarRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (navbarRef.current && !navbarRef.current.contains(event.target)) {
+                const navbarCollapse = document.getElementById('navbarSupportedContent');
+                if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+                    const toggleButton = navbarRef.current.querySelector('.navbar-toggler');
+                    if (toggleButton) {
+                        toggleButton.click();
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
+
     return (
         <nav className={`navbar navbar-expand-lg`} 
+            ref={navbarRef}
             style={{
                 boxShadow: props.mode === 'dark' 
                     ? '0 2px 10px rgba(0, 0, 0, 0.3)' 
@@ -15,7 +37,8 @@ export default function Navbar(props) {
                     : '1px solid rgba(0, 0, 0, 0.1)',
                 margin: '1rem',
                 borderRadius: '16px',
-                color: props.mode === 'dark' ? '#fff' : '#272f52'
+                color: props.mode === 'dark' ? '#fff' : '#272f52',
+                padding: '0.8em 1.5rem'
             }}>
             <div className="container-fluid">
                 <a className="navbar-brand" href="/" style={{ color: props.mode === 'dark' ? '#fff' : '#272f52' }}>
