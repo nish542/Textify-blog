@@ -12,7 +12,7 @@ export default function TextSpace(props) {
   const [error, setError] = useState(null);
   const [toLang, setToLang] = useState("hi"); // default to Hindi
 
-  const API_KEY = 'AIzaSyC4sl5KpgV5nOfhz8ml6INI1yTPf8C8nZg';
+  const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyC4sl5KpgV5nOfhz8ml6INI1yTPf8C8nZg';
   const genAI = new GoogleGenerativeAI(API_KEY);
 
   // Language options
@@ -53,15 +53,40 @@ export default function TextSpace(props) {
     setLoading(true);
     setError(null);
     try {
+      console.log('Initializing Gemini API...');
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
-      const prompt = `Correct the grammar of the following text:\n\n"${text}"\n\nReturn only the corrected text.`;
-      const result = await model.generateContent(prompt);
+      
+      const prompt = `You are a grammar correction expert. Please correct any grammatical errors in the following text. Return ONLY the corrected text without any explanations or additional text:
+
+"${text}"`;
+
+      console.log('Sending request to Gemini API...');
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }]}],
+        generationConfig: {
+          temperature: 0.1,
+          topK: 1,
+          topP: 1,
+          maxOutputTokens: 2048,
+        },
+      });
+      
+      console.log('Received response from Gemini API:', result);
       const response = await result.response;
-      const correction = response.text();
+      console.log('Response text:', response.text());
+      
+      const correction = response.text().trim();
+      if (!correction) {
+        throw new Error('Empty response from API');
+      }
+      
+      console.log('Setting corrected text:', correction);
       setCorrectedText(correction);
+      console.log('Grammar correction successful');
     } catch (err) {
       console.error("Grammar correction error:", err);
-      setError("Grammar correction failed.");
+      setError(err.message || "Grammar correction failed. Please try again.");
+      setCorrectedText("");
     } finally {
       setLoading(false);
     }
@@ -72,20 +97,43 @@ export default function TextSpace(props) {
     setTranslating(true);
     setError(null);
     try {
+      console.log('Initializing Gemini API for translation...');
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
-      const prompt = `Translate the following text to ${languages.find(lang => lang.code === toLang)?.name || toLang}:\n\n"${text}"\n\nReturn only the translated text.`;
-      const result = await model.generateContent(prompt);
+      
+      const prompt = `You are a professional translator. Translate the following text to ${languages.find(lang => lang.code === toLang)?.name || toLang}. Return ONLY the translated text without any explanations or additional text:
+
+"${text}"`;
+
+      console.log('Sending translation request to Gemini API...');
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }]}],
+        generationConfig: {
+          temperature: 0.1,
+          topK: 1,
+          topP: 1,
+          maxOutputTokens: 2048,
+        },
+      });
+      
+      console.log('Received translation response:', result);
       const response = await result.response;
-      const translation = response.text();
+      console.log('Translation text:', response.text());
+      
+      const translation = response.text().trim();
+      if (!translation) {
+        throw new Error('Empty response from API');
+      }
+      
       setTranslatedText(translation);
+      console.log('Translation successful');
     } catch (err) {
       console.error("Translation error:", err);
-      setError("Translation failed.");
+      setError(err.message || "Translation failed. Please try again.");
+      setTranslatedText("");
     } finally {
       setTranslating(false);
     }
   };
- // Changed to always show original text
 
   return (
     <div className="container py-4">
@@ -359,7 +407,7 @@ export default function TextSpace(props) {
 
         {/* Grammar Correction Section */}
         {correctedText && (
-          <div className="col-12">
+          <div className="col-12 mt-4">
             <div className="card shadow-lg border-0">
               <div className="card-header bg-success text-white py-3">
                 <h4 className="mb-0">
@@ -388,7 +436,7 @@ export default function TextSpace(props) {
                       padding: '15px',
                       borderRadius: '10px',
                       backdropFilter: 'blur(5px)',
-                      color: props.mode === 'dark' ? 'white' : 'black'
+                      color: props.mode === 'dark' ? 'black' : 'black'
                     }}>{correctedText}</p>
                   </div>
                 </div>
