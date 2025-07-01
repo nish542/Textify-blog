@@ -28,6 +28,7 @@ export default function TextSpace(props) {
     { code: "zh", name: "Chinese" },
     { code: "ar", name: "Arabic" },
     { code: "hi", name: "Hindi" },
+    { code: "ka", name: "Kannada"},
     { code: "bn", name: "Bengali" }
   ];
 
