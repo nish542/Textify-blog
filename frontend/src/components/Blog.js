@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useScrollToTop } from '../hooks/useScrollToTop';
 
-const API_BASE_URL = 'https://textify-blog.onrender.com/api';
+// API Base URL - Change this to switch between local and production
+const API_BASE_URL = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:5001/api' 
+  : 'https://textify-blog.onrender.com/api';
 
 export default function Blog(props) {
   useScrollToTop();

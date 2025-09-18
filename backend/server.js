@@ -36,8 +36,13 @@ const blogPostLimiter = rateLimit({
 
 // MongoDB connection
 console.log('MongoDB URI:', process.env.MONGODB_URI ? 'URI is set' : 'URI is not set');
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
+mongoose.connect(process.env.MONGODB_URI, {
+  dbName: 'textify'
+  })
+  .then(() => {
+    console.log('Connected to MongoDB');
+    console.log('Database Name:', mongoose.connection.name);  // <--- Important
+  })
   .catch(err => {
     console.error('MongoDB connection error:', err);
     console.error('Error details:', {
@@ -90,7 +95,7 @@ const blogSchema = new mongoose.Schema({
   }]
 });
   
-const Blog = mongoose.model('Blog', blogSchema);
+const Blog = mongoose.model('Blog', blogSchema, 'TextifyBlogs');
 
 // GET /api/blogs - Get all blog posts with pagination
 app.get('/api/blogs', async (req, res) => {
