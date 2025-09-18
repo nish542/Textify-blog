@@ -126,7 +126,7 @@ export default function About(props) {
                                             width: '100%',
                                             maxWidth: '200px',
                                             border: '6px solid',
-                                            borderColor: '#ebdeb0'
+                                            borderColor: '#ebdeb0ff'
                                         }}
                                     />
                                     <div className="mt-3 d-flex justify-content-center gap-3">
@@ -136,24 +136,47 @@ export default function About(props) {
                                                 href={link.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-decoration-none"
+                                                className="text-decoration-none enhanced-btn"
                                                 style={{
-                                                    color: props.mode === 'dark' ? '#f5e6d3' : '#6c757d',
-                                                    transition: 'all 0.3s ease',
-                                                    padding: '8px',
+                                                    color: '#706949ff',
+                                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                    padding: '11px',
                                                     borderRadius: '50%',
-                                                    backgroundColor: props.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                                                    background: 'linear-gradient(135deg, #c9b98fff 0%, #ebdeb0ff 100%)',
+                                                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                                                    position: 'relative',
+                                                    overflow: 'hidden',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    width: '42px',
+                                                    height: '42px'
                                                 }}
                                                 onMouseOver={e => {
-                                                    e.currentTarget.style.transform = 'translateY(-3px)';
-                                                    e.currentTarget.style.color = props.mode === 'dark' ? '#ffb347' : '#ff9800';
+                                                    e.currentTarget.style.transform = 'translateY(-3px) scale(1.1)';
+                                                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.4)';
                                                 }}
                                                 onMouseOut={e => {
-                                                    e.currentTarget.style.transform = 'none';
-                                                    e.currentTarget.style.color = props.mode === 'dark' ? '#f5e6d3' : '#6c757d';
+                                                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
                                                 }}
                                                 title={link.label}
                                             >
+                                                <div 
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: '-100%',
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                                                        transition: 'left 0.5s',
+                                                        borderRadius: '50%'
+                                                    }}
+                                                    onMouseOver={(e) => {
+                                                        e.target.style.left = '100%';
+                                                    }}
+                                                />
                                                 {link.icon}
                                             </a>
                                         ))}

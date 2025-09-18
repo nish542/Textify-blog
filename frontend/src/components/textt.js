@@ -157,11 +157,11 @@ export default function TextSpace(props) {
           onChange={handleOnChange}
           placeholder="Enter your text here..."
           style={{ 
-            backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'rgba(255, 255, 255, 0.7)',
+            backgroundColor: props.mode === 'dark' ? 'rgb(213 213 228)' : 'rgba(255, 255, 255, 0.7)',
             border: '2px solid rgba(233, 236, 239, 0.5)',
             borderRadius: '10px',
             transition: 'all 0.3s ease',
-            color: props.mode === 'dark' ? 'white' : 'black',
+            color: 'black',
             backdropFilter: 'blur(5px)',
             transform: 'scale(1)',
             boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
@@ -193,118 +193,220 @@ export default function TextSpace(props) {
       <div className="mb-4">
         <div className="d-flex flex-wrap justify-content-center gap-2">
           <button 
-            className="btn btn-primary" 
+            className="btn btn-primary enhanced-btn" 
             disabled={!text} 
             onClick={handleUpClick}
             style={{ 
-              transition: 'all 0.3s ease',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none',
+              borderRadius: '12px',
+              color: 'white',
+              fontWeight: '600',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+              position: 'relative',
+              overflow: 'hidden',
               transform: 'translateY(0)',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              ':hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
-              }
+              
             }}
             onMouseOver={e => {
               if (!e.currentTarget.disabled) {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.4)';
               }
             }}
             onMouseOut={e => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
             }}
           >
+            <div 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                transition: 'left 0.5s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.left = '100%';
+              }}
+            />
             <i className="fas fa-arrow-up me-1"></i> Uppercase
           </button>
           <button 
-            className="btn btn-primary" 
+            className="btn btn-primary enhanced-btn" 
             disabled={!text} 
             onClick={handleLoClick}
             style={{ 
-              transition: 'all 0.3s ease',
-              transform: 'translateY(0)',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none',
+              borderRadius: '12px',
+              color: 'white',
+              fontWeight: '600',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+              position: 'relative',
+              overflow: 'hidden',
+              transform: 'translateY(0)'
             }}
             onMouseOver={e => {
               if (!e.currentTarget.disabled) {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.4)';
               }
             }}
             onMouseOut={e => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
             }}
           >
+            <div 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                transition: 'left 0.5s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.left = '100%';
+              }}
+            />
             <i className="fas fa-arrow-down me-1"></i> Lowercase
           </button>
           <button 
-            className="btn btn-secondary" 
+            className="btn btn-secondary enhanced-btn" 
             disabled={!text} 
             onClick={handleSpace}
             style={{ 
-              transition: 'all 0.3s ease',
-              transform: 'translateY(0)',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              background: 'linear-gradient(135deg, #6c757d 0%, #495057 100%)',
+              border: 'none',
+              borderRadius: '12px',
+              color: 'white',
+              fontWeight: '600',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 12px rgba(108, 117, 125, 0.3)',
+              position: 'relative',
+              overflow: 'hidden',
+              transform: 'translateY(0)'
             }}
             onMouseOver={e => {
               if (!e.currentTarget.disabled) {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(108, 117, 125, 0.4)';
               }
             }}
             onMouseOut={e => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(108, 117, 125, 0.3)';
             }}
           >
+            <div 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                transition: 'left 0.5s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.left = '100%';
+              }}
+            />
             <i className="fas fa-compress-alt me-1"></i> Remove Spaces
           </button>
           <button 
-            className="btn btn-secondary" 
+            className="btn btn-secondary enhanced-btn" 
             disabled={!text} 
             onClick={handleClear}
             style={{ 
-              transition: 'all 0.3s ease',
-              transform: 'translateY(0)',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+              border: 'none',
+              borderRadius: '12px',
+              color: 'white',
+              fontWeight: '600',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 12px rgba(220, 53, 69, 0.3)',
+              position: 'relative',
+              overflow: 'hidden',
+              transform: 'translateY(0)'
             }}
             onMouseOver={e => {
               if (!e.currentTarget.disabled) {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(220, 53, 69, 0.4)';
               }
             }}
             onMouseOut={e => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
             }}
           >
+            <div 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                transition: 'left 0.5s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.left = '100%';
+              }}
+            />
             <i className="fas fa-trash me-1"></i> Clear
           </button>
           <button 
-            className="btn btn-success" 
+            className="btn btn-success enhanced-btn" 
             disabled={!text || loading} 
             onClick={correctGrammar}
             style={{ 
-              transition: 'all 0.3s ease',
-              transform: 'translateY(0)',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+              border: 'none',
+              borderRadius: '12px',
+              color: 'white',
+              fontWeight: '600',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
+              position: 'relative',
+              overflow: 'hidden',
+              transform: 'translateY(0)'
             }}
             onMouseOver={e => {
               if (!e.currentTarget.disabled) {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(40, 167, 69, 0.4)';
               }
             }}
             onMouseOut={e => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.3)';
             }}
           >
-            <i className="fas fa-spell-check me-1"></i>
+            <div 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                transition: 'left 0.5s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.left = '100%';
+              }}
+            />
+            <i className={`fas fa-spell-check me-1 ${loading ? 'fa-spin' : ''}`}></i>
             {loading ? "Correcting..." : "Correct Grammar"}
           </button>
         </div>
@@ -335,15 +437,48 @@ export default function TextSpace(props) {
           </div>
           <div className="col-12 col-md-6 text-md-end">
             <button 
-              className="btn btn-info w-100 w-md-auto" 
+              className="btn btn-info w-100 w-md-auto enhanced-btn" 
               disabled={!text || translating} 
               onClick={handleTranslate}
               style={{ 
-                transition: 'all 0.3s ease',
-                minWidth: '150px'
+                background: 'linear-gradient(135deg, #17a2b8 0%, #138496 100%)',
+                border: 'none',
+                borderRadius: '12px',
+                color: 'white',
+                fontWeight: '600',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: '0 4px 12px rgba(23, 162, 184, 0.3)',
+                position: 'relative',
+                overflow: 'hidden',
+                minWidth: '150px',
+                transform: 'translateY(0)'
+              }}
+              onMouseOver={e => {
+                if (!e.currentTarget.disabled) {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(23, 162, 184, 0.4)';
+                }
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(23, 162, 184, 0.3)';
               }}
             >
-              <i className="fas fa-language me-1"></i>
+              <div 
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: '-100%',
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                  transition: 'left 0.5s'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.left = '100%';
+                }}
+              />
+              <i className={`fas fa-language me-1 ${translating ? 'fa-spin' : ''}`}></i>
               {translating ? "Translating..." : "Translate"}
             </button>
           </div>

@@ -279,10 +279,45 @@ export default function Blog(props) {
 
         {/* Create Blog Button */}
         <button
-          className="btn btn-primary btn-lg"
+          className="btn btn-primary btn-lg enhanced-btn"
           onClick={() => setShowForm(!showForm)}
-          style={{ transition: 'all 0.3s ease' }}
+          style={{ 
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            border: 'none',
+            borderRadius: '15px',
+            color: 'white',
+            fontWeight: '600',
+            fontSize: '18px',
+            padding: '15px 30px',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxShadow: '0 6px 20px rgba(102, 126, 234, 0.3)',
+            position: 'relative',
+            overflow: 'hidden',
+            transform: 'translateY(0)'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.transform = 'translateY(-3px)';
+            e.target.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.4)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.3)';
+          }}
         >
+          <div 
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: '-100%',
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+              transition: 'left 0.5s'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.left = '100%';
+            }}
+          />
           <i className="fas fa-plus me-2"></i>
           {showForm ? 'Cancel' : 'Create New Blog'}
         </button>
@@ -290,14 +325,48 @@ export default function Blog(props) {
 
       {/* Blog Form */}
       {showForm && (
-        <div className="card shadow-lg border-0 mb-5">
-          <div className="card-header bg-primary text-white py-3">
-            <h4 className="mb-0">
-              <i className="fas fa-edit me-2"></i>
+        <div 
+          className="card shadow-lg border-0 mb-5"
+          style={{
+            animation: 'slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+            transform: 'translateY(0)',
+            opacity: 1,
+            borderRadius: '15px'
+          }}
+        >
+          <div 
+            className="card-header text-white py-3"
+            style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderRadius: '15px 15px 0 0',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+          >
+            <div 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)',
+                animation: 'shimmer 2s infinite'
+              }}
+            />
+            <h4 className="mb-0 position-relative">
+              <i className="fas fa-edit me-2" style={{ animation: 'bounce 2s infinite' }}></i>
               Create New Blog Post
             </h4>
           </div>
-          <div className="card-body p-4">
+          <div 
+            className="card-body p-4"
+            style={{
+              backgroundColor: props.mode === 'dark' ? 'rgba(204, 204, 236, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '0 0 15px 15px'
+            }}
+          >
             <form onSubmit={handleSubmit}>
               {submitError && (
                 <div className="alert alert-danger" role="alert">
@@ -306,116 +375,304 @@ export default function Blog(props) {
                 </div>
               )}
               
-              <div className="mb-3">
+              <div className="mb-3" style={{ animation: 'fadeInUp 0.8s ease-out' }}>
                 <label htmlFor="author" className="form-label" style={{
-                  color: props.mode === 'dark' ? '#282842' : '#212529'
+                  color: props.mode === 'dark' ? '#282842' : '#212529',
+                  fontWeight: '600',
+                  transition: 'color 0.3s ease'
                 }}>
-                  <i className="fas fa-user me-1"></i>
+                  <i className="fas fa-user me-1" style={{ color: '#667eea' }}></i>
                   Author (Optional)
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="author"
-                  name="author"
-                  value={formData.author}
-                  onChange={handleInputChange}
-                  placeholder="Anonymous"
-                  maxLength={50}
-                  style={{
-                    backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'white',
-                    border: '2px solid rgba(233, 236, 239, 0.5)',
-                    borderRadius: '10px',
-                    color: props.mode === 'dark' ? 'black' : '#212529',
-                    '::placeholder': {
-                      color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
-                    }
-                  }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    className="form-control enhanced-input"
+                    id="author"
+                    name="author"
+                    value={formData.author}
+                    onChange={handleInputChange}
+                    placeholder="Anonymous"
+                    maxLength={50}
+                    style={{
+                      backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'white',
+                      border: '2px solid rgba(233, 236, 239, 0.5)',
+                      borderRadius: '12px',
+                      color: props.mode === 'dark' ? 'black' : '#212529',
+                      padding: '12px 16px',
+                      fontSize: '16px',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                      '::placeholder': {
+                        color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
+                      }
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#667eea';
+                      e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.15)';
+                      e.target.style.transform = 'translateY(-2px)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(233, 236, 239, 0.5)';
+                      e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+                      e.target.style.transform = 'translateY(0)';
+                    }}
+                  />
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      bottom: '-8px',
+                      left: '0',
+                      height: '2px',
+                      background: 'linear-gradient(90deg, #667eea, #764ba2)',
+                      borderRadius: '1px',
+                      transition: 'width 0.3s ease',
+                      width: formData.author ? '100%' : '0%'
+                    }}
+                  />
+                </div>
               </div>
 
-              <div className="mb-3">
+              <div className="mb-3" style={{ animation: 'fadeInUp 1s ease-out' }}>
                 <label htmlFor="title" className="form-label" style={{
-                  color: props.mode === 'dark' ? '#282842' : '#212529'
+                  color: props.mode === 'dark' ? '#282842' : '#212529',
+                  fontWeight: '600',
+                  transition: 'color 0.3s ease'
                 }}>
-                  <i className="fas fa-heading me-1"></i>
+                  <i className="fas fa-heading me-1" style={{ color: '#667eea' }}></i>
                   Title *
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  placeholder="Enter your blog title..."
-                  required
-                  maxLength={200}
-                  style={{
-                    backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'white',
-                    border: '2px solid rgba(233, 236, 239, 0.5)',
-                    borderRadius: '10px',
-                    color: props.mode === 'dark' ? 'black' : '#212529',
-                    '::placeholder': {
-                      color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
-                    }
-                  }}
-                />
-                <small className="text-muted" style={{
-                  color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
-                }}>
-                  {formData.title.length}/200 characters
-                </small>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    className="form-control enhanced-input"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    placeholder="Enter your blog title..."
+                    required
+                    maxLength={200}
+                    style={{
+                      backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'white',
+                      border: '2px solid rgba(233, 236, 239, 0.5)',
+                      borderRadius: '12px',
+                      color: props.mode === 'dark' ? 'black' : '#212529',
+                      padding: '12px 16px',
+                      fontSize: '16px',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                      '::placeholder': {
+                        color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
+                      }
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#667eea';
+                      e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.15)';
+                      e.target.style.transform = 'translateY(-2px)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(233, 236, 239, 0.5)';
+                      e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+                      e.target.style.transform = 'translateY(0)';
+                    }}
+                  />
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      bottom: '-8px',
+                      left: '0',
+                      height: '2px',
+                      background: 'linear-gradient(90deg, #667eea, #764ba2)',
+                      borderRadius: '1px',
+                      transition: 'width 0.3s ease',
+                      width: formData.title ? '100%' : '0%'
+                    }}
+                  />
+                </div>
+                <div className="d-flex justify-content-between align-items-center mt-2">
+                  <small className="text-muted" style={{
+                    color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d',
+                    fontSize: '14px'
+                  }}>
+                    {formData.title.length}/200 characters
+                  </small>
+                  <div 
+                    style={{
+                      width: '60px',
+                      height: '4px',
+                      background: formData.title.length > 150 
+                        ? 'linear-gradient(90deg, #ff6b6b, #ee5a24)' 
+                        : formData.title.length > 100 
+                        ? 'linear-gradient(90deg, #feca57, #ff9ff3)' 
+                        : 'linear-gradient(90deg, #48dbfb, #0abde3)',
+                      borderRadius: '2px',
+                      transition: 'all 0.3s ease'
+                    }}
+                  />
+                </div>
               </div>
 
-              <div className="mb-4">
+              <div className="mb-4" style={{ animation: 'fadeInUp 1.2s ease-out' }}>
                 <label htmlFor="content" className="form-label" style={{
-                  color: props.mode === 'dark' ? '#282842' : '#212529'
+                  color: props.mode === 'dark' ? '#282842' : '#212529',
+                  fontWeight: '600',
+                  transition: 'color 0.3s ease'
                 }}>
-                  <i className="fas fa-align-left me-1"></i>
+                  <i className="fas fa-align-left me-1" style={{ color: '#667eea' }}></i>
                   Content *
                 </label>
-                <textarea
-                  className="form-control"
-                  id="content"
-                  name="content"
-                  rows="8"
-                  value={formData.content}
-                  onChange={handleInputChange}
-                  placeholder="Write your blog content here..."
-                  required
-                  maxLength={5000}
-                  style={{
-                    backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'white',
-                    border: '2px solid rgba(233, 236, 239, 0.5)',
-                    borderRadius: '10px',
-                    color: props.mode === 'dark' ? 'black' : '#212529',
-                    '::placeholder': {
-                      color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
-                    }
-                  }}
-                />
-                <small className="text-muted" style={{
-                  color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
-                }}>
-                  {formData.content.length}/5000 characters
-                </small>
+                <div style={{ position: 'relative' }}>
+                  <textarea
+                    className="form-control enhanced-input"
+                    id="content"
+                    name="content"
+                    rows="8"
+                    value={formData.content}
+                    onChange={handleInputChange}
+                    placeholder="Write your blog content here..."
+                    required
+                    maxLength={5000}
+                    style={{
+                      backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'white',
+                      border: '2px solid rgba(233, 236, 239, 0.5)',
+                      borderRadius: '12px',
+                      color: props.mode === 'dark' ? 'black' : '#212529',
+                      padding: '12px 16px',
+                      fontSize: '16px',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                      resize: 'vertical',
+                      minHeight: '120px',
+                      '::placeholder': {
+                        color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
+                      }
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#667eea';
+                      e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.15)';
+                      e.target.style.transform = 'translateY(-2px)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(233, 236, 239, 0.5)';
+                      e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+                      e.target.style.transform = 'translateY(0)';
+                    }}
+                  />
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      bottom: '-8px',
+                      left: '0',
+                      height: '2px',
+                      background: 'linear-gradient(90deg, #667eea, #764ba2)',
+                      borderRadius: '1px',
+                      transition: 'width 0.3s ease',
+                      width: formData.content ? '100%' : '0%'
+                    }}
+                  />
+                </div>
+                <div className="d-flex justify-content-between align-items-center mt-2">
+                  <small className="text-muted" style={{
+                    color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d',
+                    fontSize: '14px'
+                  }}>
+                    {formData.content.length}/5000 characters
+                  </small>
+                  <div 
+                    style={{
+                      width: '80px',
+                      height: '4px',
+                      background: formData.content.length > 4000 
+                        ? 'linear-gradient(90deg, #ff6b6b, #ee5a24)' 
+                        : formData.content.length > 2500 
+                        ? 'linear-gradient(90deg, #feca57, #ff9ff3)' 
+                        : 'linear-gradient(90deg, #48dbfb, #0abde3)',
+                      borderRadius: '2px',
+                      transition: 'all 0.3s ease'
+                    }}
+                  />
+                </div>
               </div>
 
-              <div className="d-flex gap-2">
+              <div className="d-flex gap-3" style={{ animation: 'fadeInUp 1.4s ease-out' }}>
                 <button
                   type="submit"
-                  className="btn btn-success"
+                  className="btn"
                   disabled={submitting}
+                  style={{
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '12px 24px',
+                    color: 'white',
+                    fontWeight: '600',
+                    fontSize: '16px',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                  onMouseOver={(e) => {
+                    if (!submitting) {
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.4)';
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    if (!submitting) {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+                    }
+                  }}
                 >
-                  <i className="fas fa-paper-plane me-1"></i>
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: '-100%',
+                      width: '100%',
+                      height: '100%',
+                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                      transition: 'left 0.5s'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.left = '100%';
+                    }}
+                  />
+                  <i className={`fas fa-paper-plane me-2 ${submitting ? 'fa-spin' : ''}`}></i>
                   {submitting ? 'Publishing...' : 'Publish Blog'}
                 </button>
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="btn"
                   onClick={() => setShowForm(false)}
+                  style={{
+                    background: 'transparent',
+                    border: '2px solid #667eea',
+                    borderRadius: '12px',
+                    padding: '12px 24px',
+                    color: '#667eea',
+                    fontWeight: '600',
+                    fontSize: '16px',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.background = '#667eea';
+                    e.target.style.color = 'white';
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.background = 'transparent';
+                    e.target.style.color = '#667eea';
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 >
+                  <i className="fas fa-times me-2"></i>
                   Cancel
                 </button>
               </div>
@@ -508,7 +765,7 @@ export default function Blog(props) {
                   {/* Comment Icon and Reply Button */}
                   <div className="d-flex gap-2 align-items-center">
                     <button
-                      className="btn btn-outline-primary btn-sm"
+                      className="btn btn-outline-primary btn-sm enhanced-btn"
                       onClick={() => toggleReplies(blog._id)}
                       style={{
                         borderRadius: '50%',
@@ -517,16 +774,48 @@ export default function Blog(props) {
                         padding: '0',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        border: 'none',
+                        color: 'white',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+                        position: 'relative',
+                        overflow: 'hidden'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.transform = 'scale(1.1)';
+                        e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.transform = 'scale(1)';
+                        e.target.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
                       }}
                     >
+                      <div 
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: '-100%',
+                          width: '100%',
+                          height: '100%',
+                          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                          transition: 'left 0.5s',
+                          borderRadius: '50%'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.left = '100%';
+                        }}
+                      />
                       <i className="fas fa-comments"></i>
                     </button>
                     <button
-                      className="btn btn-sm"
+                      className="btn btn-sm enhanced-btn"
                       onClick={() => setReplyingTo(replyingTo === blog._id ? null : blog._id)}
                       style={{
-                        backgroundColor: replyingTo === blog._id ? '#dc3545' : '#0d6efd',
+                        background: replyingTo === blog._id 
+                          ? 'linear-gradient(135deg, #dc3545 0%, #cf734eff 100%)' 
+                          : 'linear-gradient(135deg, #6c7cc7ff 0%, #775599ff 100%)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '20px',
@@ -534,21 +823,42 @@ export default function Blog(props) {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        transition: 'all 0.3s ease',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                        fontWeight: '500'
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        boxShadow: replyingTo === blog._id 
+                          ? '0 2px 8px rgba(220, 53, 69, 0.3)' 
+                          : '0 2px 8px rgba(13, 110, 253, 0.3)',
+                        fontWeight: '500',
+                        position: 'relative',
+                        overflow: 'hidden'
                       }}
                       onMouseOver={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-1px)';
-                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-                        e.currentTarget.style.backgroundColor = replyingTo === blog._id ? '#c82333' : '#0b5ed7';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = replyingTo === blog._id 
+                          ? '0 4px 12px rgba(220, 53, 69, 0.4)' 
+                          : '0 4px 12px rgba(13, 110, 253, 0.4)';
                       }}
                       onMouseOut={(e) => {
                         e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-                        e.currentTarget.style.backgroundColor = replyingTo === blog._id ? '#dc3545' : '#0d6efd';
+                        e.currentTarget.style.boxShadow = replyingTo === blog._id 
+                          ? '0 2px 8px rgba(220, 53, 69, 0.3)' 
+                          : '0 2px 8px rgba(13, 110, 253, 0.3)';
                       }}
                     >
+                      <div 
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: '-100%',
+                          width: '100%',
+                          height: '100%',
+                          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                          transition: 'left 0.5s',
+                          borderRadius: '20px'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.left = '100%';
+                        }}
+                      />
                       <i className={`fas ${replyingTo === blog._id ? 'fa-times' : 'fa-reply'}`} style={{ fontSize: '0.9rem' }}></i>
                       {replyingTo === blog._id ? 'Cancel Reply' : 'Reply'}
                     </button>
@@ -590,9 +900,45 @@ export default function Blog(props) {
                         </div>
                         <button
                           type="submit"
-                          className="btn btn-primary btn-sm"
+                          className="btn btn-primary btn-sm enhanced-btn"
                           disabled={submittingReply}
+                          style={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            border: 'none',
+                            borderRadius: '8px',
+                            color: 'white',
+                            fontWeight: '600',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+                            position: 'relative',
+                            overflow: 'hidden'
+                          }}
+                          onMouseOver={(e) => {
+                            if (!submittingReply) {
+                              e.target.style.transform = 'translateY(-1px)';
+                              e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+                            }
+                          }}
+                          onMouseOut={(e) => {
+                            e.target.style.transform = 'translateY(0)';
+                            e.target.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+                          }}
                         >
+                          <div 
+                            style={{
+                              position: 'absolute',
+                              top: 0,
+                              left: '-100%',
+                              width: '100%',
+                              height: '100%',
+                              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                              transition: 'left 0.5s',
+                              borderRadius: '8px'
+                            }}
+                            onMouseOver={(e) => {
+                              e.target.style.left = '100%';
+                            }}
+                          />
                           {submittingReply ? (
                             <>
                               <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -728,6 +1074,83 @@ const styles = `
   .app-container.light {
     background-color: #f9f7f2;
     color: #272f52;
+  }
+
+  /* Enhanced Form Animations */
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-10px);
+    }
+    60% {
+      transform: translateY(-5px);
+    }
+  }
+
+  .enhanced-input:focus {
+    outline: none !important;
+    border-color: #667eea !important;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15) !important;
+    transform: translateY(-2px) !important;
+  }
+
+  .enhanced-input:hover {
+    border-color: rgba(102, 126, 234, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1) !important;
+  }
+
+  /* Enhanced Button Animations */
+  .enhanced-btn {
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .enhanced-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .enhanced-btn:hover::before {
+    left: 100%;
   }
 `;
 
