@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useScrollToTop } from '../hooks/useScrollToTop';
 
+
 export default function TextSpace(props) {
   useScrollToTop();
   const [text, setText] = useState("");
@@ -12,7 +13,7 @@ export default function TextSpace(props) {
   const [error, setError] = useState(null);
   const [toLang, setToLang] = useState("hi"); // default to Hindi
 
-  const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyC4sl5KpgV5nOfhz8ml6INI1yTPf8C8nZg';
+  const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyCCyFk4_PLcYs1ItXlKe87G0CkMbvBCzi8';
   const genAI = new GoogleGenerativeAI(API_KEY);
 
   // Language options
@@ -55,7 +56,7 @@ export default function TextSpace(props) {
     setError(null);
     try {
       console.log('Initializing Gemini API...');
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
       
       const prompt = `You are a grammar correction expert. Please correct any grammatical errors in the following text. Return ONLY the corrected text without any explanations or additional text:
 
@@ -99,7 +100,7 @@ export default function TextSpace(props) {
     setError(null);
     try {
       console.log('Initializing Gemini API for translation...');
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
       
       const prompt = `You are a professional translator. Translate the following text to ${languages.find(lang => lang.code === toLang)?.name || toLang}. Return ONLY the translated text without any explanations or additional text:
 
@@ -139,7 +140,7 @@ export default function TextSpace(props) {
   return (
     <div className="container py-4">
       <div className="text-center mb-4">
-        <h3 className="display-5 fw-bold text-primary">{props.title}</h3>
+        <h3 className="display-5 fw-bold enhanced-heading">{props.title}</h3>
         <p className="text-center" style={{
           color: props.mode === 'dark' ? '#f5e6d3' : '#6c757d',
           fontSize: '1.1rem',

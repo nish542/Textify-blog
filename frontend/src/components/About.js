@@ -34,7 +34,7 @@ export default function About(props) {
 
     return (
         <div className="container py-4">
-            <h2 className="mb-4">About us:</h2>
+            <h2 className="mb-4 enhanced-heading">About us:</h2>
             <div className="row">
                 <div className="col-lg-6 mb-4">
                     <div className="imageBox">
@@ -115,7 +115,7 @@ export default function About(props) {
                                 border: '2px solid rgb(197 184 154)',
                             }}
                         >
-                            <h3 className="mb-3 text-center" style={{color: props.mode === 'dark' ? 'white' : 'black'}}>Created By</h3>
+                            <h3 className="mb-3 text-center enhanced-heading">Created By</h3>
                             <div className="row align-items-center justify-content-center">
                                 <div className="col-md-6 mb-3 mb-md-0">
                                     <img 
@@ -183,7 +183,7 @@ export default function About(props) {
                                     </div>
                                 </div>
                                 <div className="col-md-6 text-start">
-                                    <h4 className="mb-2" style={{color: props.mode === 'dark' ? 'white' : 'black'}}>Nishant Anand</h4>
+                                    <h4 className="mb-2 enhanced-heading">Nishant Anand</h4>
                                     <p className="mb-0 text-justify" style={{color: props.mode === 'dark' ? 'white' : 'black'}}>
                                         The creator and developer behind Textify, bringing together modern design and powerful functionality.
                                     </p>

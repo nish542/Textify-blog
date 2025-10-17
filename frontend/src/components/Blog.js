@@ -249,7 +249,7 @@ export default function Blog(props) {
     <div className={`container py-4 `} >
       {/* Header */}
       <div className="text-center mb-5">
-        <h2 className="display-5 fw-bold text-primary mb-3">Community Blogs</h2>
+        <h2 className="display-5 fw-bold enhanced-heading mb-3">Community Blogs</h2>
         <p className="mb-4" style={{
           color: props.mode === 'dark' ? '#f5e6d3' : '#6c757d',
           fontSize: '1.1rem'
