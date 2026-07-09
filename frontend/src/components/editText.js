@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useScrollToTop } from '../hooks/useScrollToTop';
-import * as S from '../styles/editTextStyles';
+import '../styles/editTextStyles.css';
 
 // API Base URL - Change this to switch between local and production
 const API_BASE_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:5001/api'
   : 'https://textify-blog.onrender.com/api';
+
+const wordCount = (value) =>
+  value.split(/\s+/).filter(word => word.length !== 0).length;
 
 export default function EditText(props) {
   useScrollToTop();
@@ -126,197 +129,134 @@ export default function EditText(props) {
       .catch(() => setError("Failed to copy to clipboard."));
   };
 
-  // Small helper so every button shares one shape; only the variant, class,
-  // disabled/onClick, and label differ.
-  const ActionButton = ({ variant, className, disabled, onClick, children }) => (
-    <button
-      className={className}
-      disabled={disabled}
-      onClick={onClick}
-      style={S.buttonStyle(variant)}
-      onMouseOver={S.onButtonHover(variant)}
-      onMouseOut={S.onButtonOut(variant)}
-    >
-      <div style={S.shimmer} onMouseOver={S.onShimmerOver} />
-      {children}
-    </button>
-  );
-
   // Copy-to-clipboard button shown in each result card header.
   const CopyButton = ({ value, copyKey }) => (
     <button
-      className="btn btn-sm"
-      style={S.copyButton}
+      className={`copy-btn${copied === copyKey ? ' copied' : ''}`}
       onClick={() => handleCopy(value, copyKey)}
-      onMouseOver={S.onCopyHover}
-      onMouseOut={S.onCopyOut}
       title="Copy to clipboard"
     >
-      <i className={`fas ${copied === copyKey ? 'fa-check' : 'fa-copy'} me-1`}></i>
+      <i className={`fas ${copied === copyKey ? 'fa-check' : 'fa-copy'}`}></i>
       {copied === copyKey ? 'Copied' : 'Copy'}
     </button>
   );
 
   return (
-    <div className="container py-4">
-      <div className="text-center mb-4">
-        <h3 className="display-5 fw-bold enhanced-heading">{props.title}</h3>
-        <p className="text-center" style={S.description(props.mode)}>
-          Transform your text with our powerful tools
-        </p>
-      </div>
+    <div className={`edit-page${props.mode === 'dark' ? ' dark' : ''}`}>
+      <header className="edit-page__header">
+        <h1 className="edit-page__title">{props.title}</h1>
+        <p className="edit-page__subtitle">Transform your text with our powerful tools</p>
+      </header>
 
-      <div className="mb-4">
-        <textarea
-          className="form-control my-2"
-          rows="4"
-          value={text}
-          onChange={handleOnChange}
-          placeholder="Enter your text here..."
-          style={S.textarea(props.mode, text)}
-          onFocus={S.onTextareaFocus}
-          onBlur={S.onTextareaBlur}
-        />
-        <style>{S.pulseKeyframes}</style>
-      </div>
+      <textarea
+        className="edit-input"
+        rows="5"
+        value={text}
+        onChange={handleOnChange}
+        placeholder="Enter your text here..."
+      />
 
       {/* Action Buttons */}
-      <div className="mb-4">
-        <div className="d-flex flex-wrap justify-content-center gap-2">
-          <ActionButton variant="uppercase" className="btn btn-primary enhanced-btn" disabled={!text} onClick={handleUpClick}>
-            <i className="fas fa-arrow-up me-1"></i> Uppercase
-          </ActionButton>
-          <ActionButton variant="lowercase" className="btn btn-primary enhanced-btn" disabled={!text} onClick={handleLoClick}>
-            <i className="fas fa-arrow-down me-1"></i> Lowercase
-          </ActionButton>
-          <ActionButton variant="removeSpaces" className="btn btn-secondary enhanced-btn" disabled={!text} onClick={handleSpace}>
-            <i className="fas fa-compress-alt me-1"></i> Remove Spaces
-          </ActionButton>
-          <ActionButton variant="clear" className="btn btn-secondary enhanced-btn" disabled={!text} onClick={handleClear}>
-            <i className="fas fa-trash me-1"></i> Clear
-          </ActionButton>
-          <ActionButton variant="grammar" className="btn btn-success enhanced-btn" disabled={!text || loading} onClick={correctGrammar}>
-            <i className={`fas fa-spell-check me-1 ${loading ? 'fa-spin' : ''}`}></i>
-            {loading ? "Correcting..." : "Correct Grammar"}
-          </ActionButton>
-        </div>
+      <div className="toolbar">
+        <button className="tool-btn" disabled={!text} onClick={handleUpClick}>
+          <i className="fas fa-arrow-up"></i> Uppercase
+        </button>
+        <button className="tool-btn" disabled={!text} onClick={handleLoClick}>
+          <i className="fas fa-arrow-down"></i> Lowercase
+        </button>
+        <button className="tool-btn" disabled={!text} onClick={handleSpace}>
+          <i className="fas fa-compress-alt"></i> Remove Spaces
+        </button>
+        <button className="tool-btn tool-btn--danger" disabled={!text} onClick={handleClear}>
+          <i className="fas fa-trash"></i> Clear
+        </button>
+        <button className="tool-btn tool-btn--accent" disabled={!text || loading} onClick={correctGrammar}>
+          <i className={`fas fa-spell-check ${loading ? 'fa-spin' : ''}`}></i>
+          {loading ? "Correcting..." : "Correct Grammar"}
+        </button>
       </div>
 
-      {/* Translation Dropdown */}
-      <div className="mb-4">
-        <div className="row g-3 align-items-center">
-          <div className="col-12 col-md-6">
-            <label className="form-label fw-bold">Select language to translate:</label>
-            <select
-              className="form-select"
-              value={toLang}
-              onChange={(e) => setToLang(e.target.value)}
-              style={S.languageSelect(props.mode)}
-            >
-              {languages.map(lang => (
-                <option key={lang.code} value={lang.code}>{lang.name}</option>
-              ))}
-            </select>
-          </div>
-          <div className="col-12 col-md-6 text-md-end">
-            <ActionButton
-              variant="translate"
-              className="btn btn-info w-100 w-md-auto enhanced-btn"
-              disabled={!text || translating}
-              onClick={handleTranslate}
-            >
-              <i className={`fas fa-language me-1 ${translating ? 'fa-spin' : ''}`}></i>
-              {translating ? "Translating..." : "Translate"}
-            </ActionButton>
-          </div>
-        </div>
+      {/* Translation Bar */}
+      <div className="translate-bar">
+        <span className="translate-bar__label">Translate to</span>
+        <select
+          className="lang-select"
+          value={toLang}
+          onChange={(e) => setToLang(e.target.value)}
+        >
+          {languages.map(lang => (
+            <option key={lang.code} value={lang.code}>{lang.name}</option>
+          ))}
+        </select>
+        <button className="tool-btn tool-btn--teal" disabled={!text || translating} onClick={handleTranslate}>
+          <i className={`fas fa-language ${translating ? 'fa-spin' : ''}`}></i>
+          {translating ? "Translating..." : "Translate"}
+        </button>
       </div>
 
-      {/* Results Container */}
-      <div className="row g-4">
-        {/* Original Text Section */}
-        <div className="col-12 col-md-6">
-          <div className="card h-100 shadow-lg border-0" style={S.resultCard}>
-            <div className="card-header text-white py-3 d-flex justify-content-between align-items-center" style={S.cardHeader('original')}>
-              <h4 className="mb-0">
-                <i className="fas fa-file-alt me-2"></i>
-                Original Text
+      {/* Results */}
+      <div className="results">
+        {/* Original Text */}
+        <div className="result-card result-card--original">
+          <div className="result-card__header">
+            <h4 className="result-card__title">
+              <i className="fas fa-file-alt"></i> Original Text
+            </h4>
+            {text && <CopyButton value={text} copyKey="original" />}
+          </div>
+          <div className="result-card__body">
+            <p className={`result-card__text${text ? '' : ' result-card__text--empty'}`}>
+              {text.length > 0 ? text : "Nothing to preview"}
+            </p>
+            <div className="result-card__meta">
+              <span><i className="fas fa-font"></i>{wordCount(text)} words</span>
+              <span><i className="fas fa-text-width"></i>{text.length} characters</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Translation */}
+        {translatedText && (
+          <div className="result-card result-card--translation">
+            <div className="result-card__header">
+              <h4 className="result-card__title">
+                <i className="fas fa-language"></i>
+                Translation ({languages.find(lang => lang.code === toLang)?.name})
               </h4>
-              {text && <CopyButton value={text} copyKey="original" />}
+              <CopyButton value={translatedText} copyKey="translation" />
             </div>
-            <div className="card-body">
-              <p className="card-text" style={S.cardText}>
-                {text.length > 0 ? text : "Nothing to preview"}
-              </p>
-              <div className="text-muted mt-3">
-                <small>
-                  <i className="fas fa-font me-1"></i>
-                  {text.split(/\s+/).filter(word => word.length !== 0).length} words
-                </small>
-                <small className="ms-3">
-                  <i className="fas fa-text-width me-1"></i>
-                  {text.length} characters
-                </small>
+            <div className="result-card__body">
+              <p className="result-card__text">{translatedText}</p>
+              <div className="result-card__meta">
+                <span><i className="fas fa-font"></i>{wordCount(translatedText)} words</span>
+                <span><i className="fas fa-text-width"></i>{translatedText.length} characters</span>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Translation Section */}
-        <div className="col-12 col-md-6">
-          {translatedText && (
-            <div className="card h-100 shadow-lg border-0" style={S.resultCard}>
-              <div className="card-header text-white py-3 d-flex justify-content-between align-items-center" style={S.cardHeader('translation')}>
-                <h4 className="mb-0">
-                  <i className="fas fa-language me-2"></i>
-                  Translation ({languages.find(lang => lang.code === toLang)?.name})
-                </h4>
-                <CopyButton value={translatedText} copyKey="translation" />
-              </div>
-              <div className="card-body">
-                <p className="card-text" style={S.cardText}>{translatedText}</p>
-                <div className="text-muted mt-3">
-                  <small>
-                    <i className="fas fa-font me-1"></i>
-                    {translatedText.split(/\s+/).filter(word => word.length !== 0).length} words
-                  </small>
-                  <small className="ms-3">
-                    <i className="fas fa-text-width me-1"></i>
-                    {translatedText.length} characters
-                  </small>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Grammar Correction Section */}
+        {/* Grammar Correction */}
         {correctedText && (
-          <div className="col-12 mt-4">
-            <div className="card shadow-lg border-0" style={S.resultCard}>
-              <div className="card-header text-white py-3 d-flex justify-content-between align-items-center" style={S.cardHeader('grammar')}>
-                <h4 className="mb-0">
-                  <i className="fas fa-spell-check me-2"></i>
-                  Grammar Correction
-                </h4>
-                <CopyButton value={correctedText} copyKey="corrected" />
-              </div>
-              <div className="card-body">
-                <div className="row g-4">
-                  <div className="col-12 col-md-6">
-                    <h5 className="text-muted mb-3">
-                      <i className="fas fa-file-alt me-2"></i>
-                      Original Text
-                    </h5>
-                    <p className="card-text" style={S.cardText}>{text}</p>
+          <div className="result-card result-card--grammar results__full">
+            <div className="result-card__header">
+              <h4 className="result-card__title">
+                <i className="fas fa-spell-check"></i> Grammar Correction
+              </h4>
+              <CopyButton value={correctedText} copyKey="corrected" />
+            </div>
+            <div className="result-card__body">
+              <div className="correction-grid">
+                <div>
+                  <div className="correction-label">
+                    <i className="fas fa-file-alt"></i> Original
                   </div>
-                  <div className="col-12 col-md-6">
-                    <h5 className="text-muted mb-3">
-                      <i className="fas fa-check-circle me-2"></i>
-                      Corrected Text
-                    </h5>
-                    <p className="card-text" style={S.correctedText(props.mode)}>{correctedText}</p>
+                  <p className="result-card__text">{text}</p>
+                </div>
+                <div>
+                  <div className="correction-label">
+                    <i className="fas fa-check-circle"></i> Corrected
                   </div>
+                  <div className="correction-box">{correctedText}</div>
                 </div>
               </div>
             </div>
@@ -325,8 +265,8 @@ export default function EditText(props) {
       </div>
 
       {error && (
-        <div className="alert alert-danger mt-4 shadow-sm" role="alert">
-          <i className="fas fa-exclamation-circle me-2"></i>
+        <div className="edit-error" role="alert">
+          <i className="fas fa-exclamation-circle"></i>
           {error}
         </div>
       )}
