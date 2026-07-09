@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const { correctGrammar, translate } = require('./grammar');
 require('dotenv').config();
 
 const app = express();
@@ -259,6 +260,66 @@ app.get('/api/blogs/:id/replies', async (req, res) => {
   }
 });
 
+// Rate limiting for grammar correction (protects the GitHub Models quota)
+const grammarLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30, // limit each IP to 30 corrections per windowMs
+  message: { error: 'Too many grammar-correction requests. Please try again later.' }
+});
+
+// POST /api/correct-grammar - Correct grammar via GitHub Models (gpt-4o-mini)
+app.post('/api/correct-grammar', grammarLimiter, async (req, res) => {
+  try {
+    const { text } = req.body;
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ error: 'Text is required' });
+    }
+
+    if (text.length > 2000) {
+      return res.status(400).json({ error: 'Text must be less than 2000 characters' });
+    }
+
+    const correctedText = await correctGrammar(text.trim());
+    res.json({ correctedText });
+  } catch (error) {
+    // Log only the message (never the full error object, which can include headers)
+    console.error('Grammar correction error:', error.message);
+    if (error.status === 429) {
+      return res.status(429).json({ error: 'Grammar service is busy (daily/rate limit reached). Please try again later.' });
+    }
+    res.status(500).json({ error: 'Grammar correction failed. Please try again.' });
+  }
+});
+
+// POST /api/translate - Translate text via GitHub Models (gpt-4o-mini)
+app.post('/api/translate', grammarLimiter, async (req, res) => {
+  try {
+    const { text, targetLanguage } = req.body;
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ error: 'Text is required' });
+    }
+
+    if (!targetLanguage || !targetLanguage.trim()) {
+      return res.status(400).json({ error: 'Target language is required' });
+    }
+
+    if (text.length > 2000) {
+      return res.status(400).json({ error: 'Text must be less than 2000 characters' });
+    }
+
+    const translatedText = await translate(text.trim(), targetLanguage.trim());
+    res.json({ translatedText });
+  } catch (error) {
+    console.error('Translation error:', error.message);
+    if (error.status === 429) {
+      return res.status(429).json({ error: 'Translation service is busy (daily/rate limit reached). Please try again later.' });
+    }
+    res.status(500).json({ error: 'Translation failed. Please try again.' });
+  }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ 
@@ -274,6 +335,10 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`CORS enabled for: ${['https://textify-blog.vercel.app', 'http://localhost:3000'].join(', ')}`);
+
+  if (!process.env.GITHUB_TOKEN) {
+    console.warn('⚠️  GITHUB_TOKEN is not set — grammar correction will fail until it is configured.');
+  }
 });
 
 module.exports = app;
