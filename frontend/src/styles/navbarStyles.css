@@ -1,0 +1,378 @@
+/* ============================================================================
+   Navbar — Medium/Notion-style: brand left, links centered, profile top-right.
+   Theme comes from the `.tf-navbar.dark` modifier (driven by props.mode).
+   ========================================================================== */
+
+.tf-navbar {
+  --tf-text: #272f52;
+  --tf-muted: #6b7280;
+  --tf-brand: #ff9800;
+  --tf-brand-2: #f06292;
+  --tf-bg: rgba(249, 247, 242, 0.62);
+  --tf-border: rgba(0, 0, 0, 0.08);
+  --tf-surface: #ffffff;
+  --tf-chip: rgba(0, 0, 0, 0.05);
+  --tf-hover: rgba(0, 0, 0, 0.05);
+  --tf-active-bg: rgba(255, 152, 0, 0.12);
+  --tf-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
+  --tf-shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.08);
+
+  margin: 1rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 20px;
+  background: var(--tf-bg);
+  border: 1px solid var(--tf-border);
+  box-shadow: var(--tf-shadow-sm);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--tf-text);
+  position: relative;
+  z-index: 1050;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tf-navbar.dark {
+  --tf-text: #f5f5fa;
+  --tf-muted: #a1a1ad;
+  --tf-brand: #ffb347;
+  --tf-brand-2: #f06292;
+  --tf-bg: rgba(11, 11, 21, 0.55);
+  --tf-border: rgba(255, 255, 255, 0.09);
+  --tf-surface: #1b1b2b;
+  --tf-chip: rgba(255, 255, 255, 0.06);
+  --tf-hover: rgba(255, 255, 255, 0.08);
+  --tf-active-bg: rgba(255, 179, 71, 0.16);
+  --tf-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+  --tf-shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.tf-navbar__inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* --- Brand (left) ---------------------------------------------------------- */
+
+.tf-brand {
+  grid-column: 1;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: var(--tf-brand);
+  transition: opacity 0.2s ease;
+}
+.tf-brand i { color: var(--tf-brand-2); }
+.tf-brand:hover { color: var(--tf-brand); opacity: 0.85; }
+
+/* --- Center nav links ------------------------------------------------------ */
+
+.tf-nav {
+  grid-column: 2;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tf-nav-link {
+  position: relative;
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  color: var(--tf-text);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.98rem;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+/* Animated gradient underline that grows from the center */
+.tf-nav-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: 3px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--tf-brand), var(--tf-brand-2));
+  transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1), right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tf-nav-link:hover {
+  color: var(--tf-brand);
+  background: var(--tf-hover);
+}
+.tf-nav-link:hover::after { left: 22%; right: 22%; }
+.tf-nav-link.active {
+  color: var(--tf-brand);
+  font-weight: 600;
+}
+.tf-nav-link.active::after { left: 14%; right: 14%; }
+
+/* --- Right actions --------------------------------------------------------- */
+
+.tf-actions {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Compact theme toggle */
+.tf-theme-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--tf-border);
+  background: var(--tf-chip);
+  color: var(--tf-brand);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.tf-theme-btn:hover {
+  transform: translateY(-1px);
+  background: var(--tf-hover);
+  box-shadow: var(--tf-shadow-sm);
+}
+.tf-theme-btn:active { transform: translateY(0) scale(0.94); }
+
+/* Login button (logged out) */
+.tf-login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--tf-brand), var(--tf-brand-2));
+  box-shadow: 0 6px 16px rgba(240, 98, 146, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.tf-login-btn:hover {
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(240, 98, 146, 0.38);
+}
+
+/* --- Profile + dropdown ---------------------------------------------------- */
+
+.tf-profile { position: relative; }
+
+.tf-profile__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.35rem;
+  border-radius: 999px;
+  border: 1px solid var(--tf-border);
+  background: var(--tf-chip);
+  color: var(--tf-text);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.tf-profile__trigger:hover {
+  background: var(--tf-hover);
+  box-shadow: var(--tf-shadow-sm);
+}
+
+.tf-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--tf-brand), var(--tf-brand-2));
+  color: #fff;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.tf-profile__name {
+  font-size: 0.92rem;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tf-caret {
+  font-size: 0.7rem;
+  color: var(--tf-muted);
+  transition: transform 0.2s ease;
+}
+.tf-profile.open .tf-caret { transform: rotate(180deg); }
+
+.tf-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 220px;
+  background: var(--tf-surface);
+  border: 1px solid var(--tf-border);
+  border-radius: 14px;
+  box-shadow: var(--tf-shadow);
+  padding: 0.4rem;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transform-origin: top right;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 30;
+}
+.tf-dropdown.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.tf-dropdown__header { padding: 0.5rem 0.75rem 0.6rem; }
+.tf-dropdown__header .name { font-weight: 600; color: var(--tf-text); }
+.tf-dropdown__header .email {
+  font-size: 0.8rem;
+  color: var(--tf-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tf-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  color: var(--tf-text);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tf-dropdown__item i { width: 16px; text-align: center; color: var(--tf-muted); }
+.tf-dropdown__item:hover { background: var(--tf-hover); color: var(--tf-brand); }
+.tf-dropdown__item:hover i { color: var(--tf-brand); }
+
+.tf-dropdown__divider {
+  height: 1px;
+  background: var(--tf-border);
+  margin: 0.4rem 0.25rem;
+  border: none;
+}
+
+.tf-dropdown__item--danger { color: #ef4444; }
+.tf-dropdown__item--danger i { color: #ef4444; }
+.tf-dropdown__item--danger:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.tf-dropdown__item--danger:hover i { color: #ef4444; }
+
+/* --- Mobile ---------------------------------------------------------------- */
+
+.tf-hamburger {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--tf-border);
+  background: var(--tf-chip);
+  color: var(--tf-text);
+  cursor: pointer;
+  place-items: center;
+  font-size: 1.05rem;
+}
+
+.tf-mobile-menu { display: none; }
+
+@media (max-width: 768px) {
+  .tf-nav { display: none; }
+  .tf-hamburger { display: grid; }
+  .tf-profile__name { display: none; }
+  /* On mobile the theme toggle lives inside the hamburger dropdown instead */
+  .tf-theme-btn { display: none; }
+
+  /* Compact floating dropdown anchored to the right (not full-width) */
+  .tf-mobile-menu {
+    display: block;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0.6rem;
+    min-width: 200px;
+    max-width: 260px;
+    background: var(--tf-surface);
+    border: 1px solid var(--tf-border);
+    border-radius: 14px;
+    box-shadow: var(--tf-shadow);
+    padding: 0.4rem;
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+    transform-origin: top right;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 40;
+  }
+  .tf-mobile-menu.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+  .tf-mobile-menu__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+  .tf-mobile-link {
+    padding: 0.55rem 0.75rem;
+    border-radius: 10px;
+    color: var(--tf-text);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  .tf-mobile-link:hover,
+  .tf-mobile-link.active {
+    background: var(--tf-active-bg);
+    color: var(--tf-brand);
+  }
+
+  .tf-mobile-divider {
+    height: 1px;
+    background: var(--tf-border);
+    margin: 0.4rem 0.25rem;
+    border: none;
+  }
+
+  /* Theme toggle rendered as a menu row on mobile */
+  .tf-mobile-theme {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    border: none;
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .tf-mobile-theme i { width: 16px; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tf-dropdown { transition: opacity 0.18s ease; transform: none; }
+  .tf-dropdown.open { transform: none; }
+  .tf-mobile-menu { transition: none; }
+}
