@@ -75,7 +75,7 @@ export default function Navbar(props) {
             <div className={`tf-profile${profileOpen ? ' open' : ''}`}>
               <button
                 className="tf-profile__trigger"
-                onClick={() => setProfileOpen((o) => !o)}
+                onClick={() => { setProfileOpen((o) => !o); setMenuOpen(false); }}
                 aria-haspopup="true"
                 aria-expanded={profileOpen}
               >
@@ -119,7 +119,7 @@ export default function Navbar(props) {
 
           <button
             className="tf-hamburger"
-            onClick={() => setMenuOpen((o) => !o)}
+            onClick={() => { setMenuOpen((o) => !o); setProfileOpen(false); }}
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
           >
@@ -140,6 +140,11 @@ export default function Navbar(props) {
               {l.label}
             </a>
           ))}
+          <div className="tf-mobile-divider" />
+          <button className="tf-mobile-link tf-mobile-theme" onClick={props.toggleMode}>
+            <i className={`fas fa-${isDark ? 'sun' : 'moon'}`}></i>
+            {isDark ? 'Light mode' : 'Dark mode'}
+          </button>
         </div>
       </div>
     </nav>
