@@ -36,7 +36,10 @@
 .edit-page::before {
   content: '';
   position: absolute;
-  inset: -12% -18%;
+  /* No horizontal bleed → the glow can't push the page wider than the screen
+     (which caused horizontal overflow on mobile). Top pinned to 0 so it also
+     stays out from under the navbar. */
+  inset: 0 0 -8% 0;
   z-index: -1;
   pointer-events: none;
   background:
@@ -479,9 +482,10 @@
 }
 
 @keyframes ep-aurora {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  50%  { transform: translate3d(0, -4%, 0) scale(1.08); }
-  100% { transform: translate3d(0, 3%, 0) scale(1.04); }
+  /* Vertical drift only — no scale, so the glow never widens past the page */
+  0%   { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(0, 2.5%, 0); }
+  100% { transform: translate3d(0, 1%, 0); }
 }
 
 /* --- Responsive ------------------------------------------------------------ */
