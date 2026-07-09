@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useScrollToTop } from '../hooks/useScrollToTop';
+
+// API Base URL - Change this to switch between local and production
+const API_BASE_URL = process.env.NODE_ENV === 'development'
+  ? 'http://localhost:5001/api'
+  : 'https://textify-blog.onrender.com/api';
 
 
 export default function TextSpace(props) {
@@ -12,9 +16,6 @@ export default function TextSpace(props) {
   const [translating, setTranslating] = useState(false);
   const [error, setError] = useState(null);
   const [toLang, setToLang] = useState("hi"); // default to Hindi
-
-  const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyCCyFk4_PLcYs1ItXlKe87G0CkMbvBCzi8';
-  const genAI = new GoogleGenerativeAI(API_KEY);
 
   // Language options
   const languages = [
@@ -55,36 +56,24 @@ export default function TextSpace(props) {
     setLoading(true);
     setError(null);
     try {
-      console.log('Initializing Gemini API...');
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
-      
-      const prompt = `You are a grammar correction expert. Please correct any grammatical errors in the following text. Return ONLY the corrected text without any explanations or additional text:
-
-"${text}"`;
-
-      console.log('Sending request to Gemini API...');
-      const result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: prompt }]}],
-        generationConfig: {
-          temperature: 0.1,
-          topK: 1,
-          topP: 1,
-          maxOutputTokens: 2048,
-        },
+      // Grammar correction runs on our backend, which calls GitHub Models
+      // (gpt-4o-mini). The token stays server-side — no API key in the browser.
+      const response = await fetch(`${API_BASE_URL}/correct-grammar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
       });
-      
-      console.log('Received response from Gemini API:', result);
-      const response = await result.response;
-      console.log('Response text:', response.text());
-      
-      const correction = response.text().trim();
-      if (!correction) {
-        throw new Error('Empty response from API');
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Grammar correction failed');
       }
-      
-      console.log('Setting corrected text:', correction);
-      setCorrectedText(correction);
-      console.log('Grammar correction successful');
+
+      if (!data.correctedText) {
+        throw new Error('Empty response from server');
+      }
+
+      setCorrectedText(data.correctedText);
     } catch (err) {
       console.error("Grammar correction error:", err);
       setError(err.message || "Grammar correction failed. Please try again.");
@@ -99,35 +88,24 @@ export default function TextSpace(props) {
     setTranslating(true);
     setError(null);
     try {
-      console.log('Initializing Gemini API for translation...');
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
-      
-      const prompt = `You are a professional translator. Translate the following text to ${languages.find(lang => lang.code === toLang)?.name || toLang}. Return ONLY the translated text without any explanations or additional text:
-
-"${text}"`;
-
-      console.log('Sending translation request to Gemini API...');
-      const result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: prompt }]}],
-        generationConfig: {
-          temperature: 0.1,
-          topK: 1,
-          topP: 1,
-          maxOutputTokens: 2048,
-        },
+      // Translation runs on our backend, which calls GitHub Models (gpt-4o-mini).
+      const targetLanguage = languages.find(lang => lang.code === toLang)?.name || toLang;
+      const response = await fetch(`${API_BASE_URL}/translate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, targetLanguage }),
       });
-      
-      console.log('Received translation response:', result);
-      const response = await result.response;
-      console.log('Translation text:', response.text());
-      
-      const translation = response.text().trim();
-      if (!translation) {
-        throw new Error('Empty response from API');
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Translation failed');
       }
-      
-      setTranslatedText(translation);
-      console.log('Translation successful');
+
+      if (!data.translatedText) {
+        throw new Error('Empty response from server');
+      }
+
+      setTranslatedText(data.translatedText);
     } catch (err) {
       console.error("Translation error:", err);
       setError(err.message || "Translation failed. Please try again.");
