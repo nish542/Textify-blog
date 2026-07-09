@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useScrollToTop } from '../hooks/useScrollToTop';
+import { useAuth } from '../context/AuthContext';
 
 // API Base URL - Change this to switch between local and production
 const API_BASE_URL = process.env.NODE_ENV === 'development' 
@@ -8,6 +9,7 @@ const API_BASE_URL = process.env.NODE_ENV === 'development'
 
 export default function Blog(props) {
   useScrollToTop();
+  const { user, token } = useAuth();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,7 +22,7 @@ export default function Blog(props) {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    author: ''
+    isAnonymous: false
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -112,7 +114,12 @@ export default function Blog(props) {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    if (!token) {
+      setSubmitError('Please log in to publish a blog post.');
+      return;
+    }
+
     if (!formData.title.trim() || !formData.content.trim()) {
       setSubmitError('Title and content are required');
       return;
@@ -122,37 +129,38 @@ export default function Blog(props) {
     setSubmitError(null);
 
     try {
-      console.log('Submitting blog post:', formData);
       const response = await fetch(`${API_BASE_URL}/blogs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         mode: 'cors',
-        credentials: 'include',
         body: JSON.stringify({
           title: formData.title.trim(),
           content: formData.content.trim(),
-          author: formData.author.trim() || 'Anonymous'
+          isAnonymous: formData.isAnonymous
         }),
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
-        throw new Error(data.error || data.details || 'Failed to create blog post');
+        if (response.status === 401) {
+          throw new Error('Your session has expired. Please log in again.');
+        }
+        throw new Error(data.error || 'Failed to create blog post');
       }
 
       // Reset form and refresh blogs
-      setFormData({ title: '', content: '', author: '' });
+      setFormData({ title: '', content: '', isAnonymous: false });
       setShowForm(false);
       await fetchBlogs(1);
       await fetchStats();
-      
-      // Show success message
+
       alert('Blog post created successfully!');
-      
+
     } catch (err) {
       console.error('Error creating blog:', err);
       setSubmitError(err.message || 'Failed to create blog post. Please try again.');
@@ -280,7 +288,7 @@ export default function Blog(props) {
         {/* Create Blog Button */}
         <button
           className="btn btn-primary btn-lg enhanced-btn"
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => { if (!user) { window.location.href = '/login'; return; } setShowForm(!showForm); }}
           style={{ 
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             border: 'none',
@@ -318,8 +326,8 @@ export default function Blog(props) {
               e.target.style.left = '100%';
             }}
           />
-          <i className="fas fa-plus me-2"></i>
-          {showForm ? 'Cancel' : 'Create New Blog'}
+          <i className={`fas ${user ? 'fa-plus' : 'fa-sign-in-alt'} me-2`}></i>
+          {!user ? 'Log in to write a blog' : (showForm ? 'Cancel' : 'Create New Blog')}
         </button>
       </div>
 
@@ -376,61 +384,40 @@ export default function Blog(props) {
               )}
               
               <div className="mb-3" style={{ animation: 'fadeInUp 0.8s ease-out' }}>
-                <label htmlFor="author" className="form-label" style={{
-                  color: props.mode === 'dark' ? '#282842' : '#212529',
-                  fontWeight: '600',
-                  transition: 'color 0.3s ease'
-                }}>
-                  <i className="fas fa-user me-1" style={{ color: '#667eea' }}></i>
-                  Author (Optional)
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type="text"
-                    className="form-control enhanced-input"
-                    id="author"
-                    name="author"
-                    value={formData.author}
-                    onChange={handleInputChange}
-                    placeholder="Anonymous"
-                    maxLength={50}
-                    style={{
-                      backgroundColor: props.mode === 'dark' ? 'rgb(204, 204, 236)' : 'white',
-                      border: '2px solid rgba(233, 236, 239, 0.5)',
-                      borderRadius: '12px',
-                      color: props.mode === 'dark' ? 'black' : '#212529',
-                      padding: '12px 16px',
-                      fontSize: '16px',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                      '::placeholder': {
-                        color: props.mode === 'dark' ? '#a0a0a0' : '#6c757d'
-                      }
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = '#667eea';
-                      e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.15)';
-                      e.target.style.transform = 'translateY(-2px)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(233, 236, 239, 0.5)';
-                      e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
-                      e.target.style.transform = 'translateY(0)';
-                    }}
-                  />
-                  <div 
-                    style={{
-                      position: 'absolute',
-                      bottom: '-8px',
-                      left: '0',
-                      height: '2px',
-                      background: 'linear-gradient(90deg, #667eea, #764ba2)',
-                      borderRadius: '1px',
-                      transition: 'width 0.3s ease',
-                      width: formData.author ? '100%' : '0%'
-                    }}
-                  />
+                <div
+                  className="d-flex flex-wrap align-items-center justify-content-between gap-2 p-3"
+                  style={{
+                    backgroundColor: props.mode === 'dark' ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.08)',
+                    border: '1px solid rgba(102, 126, 234, 0.25)',
+                    borderRadius: '12px'
+                  }}
+                >
+                  <span style={{ color: props.mode === 'dark' ? '#282842' : '#212529', fontWeight: '600' }}>
+                    <i className={`fas ${formData.isAnonymous ? 'fa-user-secret' : 'fa-user'} me-2`} style={{ color: '#667eea' }}></i>
+                    {formData.isAnonymous
+                      ? 'Posting anonymously'
+                      : <>Posting as <strong>{user ? user.name : ''}</strong></>}
+                  </span>
+                  <div className="form-check form-switch m-0">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="isAnonymous"
+                      checked={formData.isAnonymous}
+                      onChange={(e) => setFormData(prev => ({ ...prev, isAnonymous: e.target.checked }))}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <label className="form-check-label ms-1" htmlFor="isAnonymous"
+                      style={{ color: props.mode === 'dark' ? '#282842' : '#212529', fontWeight: '500', cursor: 'pointer' }}>
+                      Publish anonymously
+                    </label>
+                  </div>
                 </div>
+                <small className="d-block mt-2" style={{ color: props.mode === 'dark' ? '#f5e6d3' : '#6c757d' }}>
+                  <i className="fas fa-lock me-1"></i>
+                  Anonymous posts stay linked to your account privately — only you can see and manage them in your profile.
+                </small>
               </div>
 
               <div className="mb-3" style={{ animation: 'fadeInUp 1s ease-out' }}>
