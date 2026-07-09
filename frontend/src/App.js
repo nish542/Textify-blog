@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import Navbar from './components/Navbar.js';
-import TextSpace from './components/textt.js';
+import EditText from './components/editText.js';
 import About from './components/About.js';
 import Blog from './components/Blog.js';
 import Alert from './components/Alert.js';
@@ -67,7 +67,7 @@ function App() {
     },
     {
       path: '/edit',
-      element: <ScrollToTopWrapper><TextSpace title="Enter text" Text="Enter text here" mode={mode} showAlert={showAlert} /></ScrollToTopWrapper>
+      element: <ScrollToTopWrapper><EditText title="Enter text" Text="Enter text here" mode={mode} showAlert={showAlert} /></ScrollToTopWrapper>
     },
     {
       path: '/about',
