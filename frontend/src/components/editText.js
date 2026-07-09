@@ -16,6 +16,7 @@ export default function EditText(props) {
   const [translating, setTranslating] = useState(false);
   const [error, setError] = useState(null);
   const [toLang, setToLang] = useState("hi"); // default to Hindi
+  const [copied, setCopied] = useState(null); // which block was last copied
 
   // Language options
   const languages = [
@@ -115,6 +116,16 @@ export default function EditText(props) {
     }
   };
 
+  const handleCopy = (value, key) => {
+    if (!value) return;
+    navigator.clipboard.writeText(value)
+      .then(() => {
+        setCopied(key);
+        setTimeout(() => setCopied(null), 1500);
+      })
+      .catch(() => setError("Failed to copy to clipboard."));
+  };
+
   // Small helper so every button shares one shape; only the variant, class,
   // disabled/onClick, and label differ.
   const ActionButton = ({ variant, className, disabled, onClick, children }) => (
@@ -128,6 +139,21 @@ export default function EditText(props) {
     >
       <div style={S.shimmer} onMouseOver={S.onShimmerOver} />
       {children}
+    </button>
+  );
+
+  // Copy-to-clipboard button shown in each result card header.
+  const CopyButton = ({ value, copyKey }) => (
+    <button
+      className="btn btn-sm"
+      style={S.copyButton}
+      onClick={() => handleCopy(value, copyKey)}
+      onMouseOver={S.onCopyHover}
+      onMouseOut={S.onCopyOut}
+      title="Copy to clipboard"
+    >
+      <i className={`fas ${copied === copyKey ? 'fa-check' : 'fa-copy'} me-1`}></i>
+      {copied === copyKey ? 'Copied' : 'Copy'}
     </button>
   );
 
@@ -210,12 +236,13 @@ export default function EditText(props) {
       <div className="row g-4">
         {/* Original Text Section */}
         <div className="col-12 col-md-6">
-          <div className="card h-100 shadow-lg border-0">
-            <div className="card-header bg-primary text-white py-3">
+          <div className="card h-100 shadow-lg border-0" style={S.resultCard}>
+            <div className="card-header text-white py-3 d-flex justify-content-between align-items-center" style={S.cardHeader('original')}>
               <h4 className="mb-0">
                 <i className="fas fa-file-alt me-2"></i>
                 Original Text
               </h4>
+              {text && <CopyButton value={text} copyKey="original" />}
             </div>
             <div className="card-body">
               <p className="card-text" style={S.cardText}>
@@ -238,12 +265,13 @@ export default function EditText(props) {
         {/* Translation Section */}
         <div className="col-12 col-md-6">
           {translatedText && (
-            <div className="card h-100 shadow-lg border-0">
-              <div className="card-header bg-info text-white py-3">
+            <div className="card h-100 shadow-lg border-0" style={S.resultCard}>
+              <div className="card-header text-white py-3 d-flex justify-content-between align-items-center" style={S.cardHeader('translation')}>
                 <h4 className="mb-0">
                   <i className="fas fa-language me-2"></i>
                   Translation ({languages.find(lang => lang.code === toLang)?.name})
                 </h4>
+                <CopyButton value={translatedText} copyKey="translation" />
               </div>
               <div className="card-body">
                 <p className="card-text" style={S.cardText}>{translatedText}</p>
@@ -265,12 +293,13 @@ export default function EditText(props) {
         {/* Grammar Correction Section */}
         {correctedText && (
           <div className="col-12 mt-4">
-            <div className="card shadow-lg border-0">
-              <div className="card-header bg-success text-white py-3">
+            <div className="card shadow-lg border-0" style={S.resultCard}>
+              <div className="card-header text-white py-3 d-flex justify-content-between align-items-center" style={S.cardHeader('grammar')}>
                 <h4 className="mb-0">
                   <i className="fas fa-spell-check me-2"></i>
                   Grammar Correction
                 </h4>
+                <CopyButton value={correctedText} copyKey="corrected" />
               </div>
               <div className="card-body">
                 <div className="row g-4">

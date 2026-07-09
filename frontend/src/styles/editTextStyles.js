@@ -145,6 +145,46 @@ export const languageSelect = (mode) => ({
 
 // --- Result cards ------------------------------------------------------------
 
+export const resultCard = {
+  borderRadius: '16px',
+  overflow: 'hidden',
+  border: 'none',
+};
+
+// Header gradients mirror each block's action-button color so results tie back
+// to the control that produced them.
+const headerGradients = {
+  original: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  translation: 'linear-gradient(135deg, #17a2b8 0%, #138496 100%)',
+  grammar: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+};
+
+export const cardHeader = (variant) => ({
+  background: headerGradients[variant],
+  border: 'none',
+});
+
+export const copyButton = {
+  background: 'rgba(255, 255, 255, 0.2)',
+  border: '1px solid rgba(255, 255, 255, 0.4)',
+  borderRadius: '8px',
+  color: 'white',
+  fontSize: '0.8rem',
+  fontWeight: '600',
+  padding: '4px 12px',
+  transition: 'all 0.2s ease',
+  backdropFilter: 'blur(4px)',
+  whiteSpace: 'nowrap',
+};
+
+export const onCopyHover = (e) => {
+  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.35)';
+};
+
+export const onCopyOut = (e) => {
+  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+};
+
 export const cardText = { minHeight: '100px' };
 
 export const correctedText = (mode) => ({
