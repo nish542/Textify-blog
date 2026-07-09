@@ -1,7 +1,24 @@
 import React, { useEffect, useRef } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar(props) {
     const navbarRef = useRef(null);
+    const { user, logout } = useAuth();
+
+    const navLinkStyle = {
+        color: props.mode === 'dark' ? '#fff' : '#272f52',
+        fontWeight: '500',
+        padding: '0.5rem 1rem',
+        borderRadius: '12px',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        position: 'relative',
+    };
+
+    const handleLogout = (e) => {
+        e.preventDefault();
+        logout();
+        window.location.href = '/';
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -106,6 +123,29 @@ export default function Navbar(props) {
                                 About
                             </a>
                         </li>
+                        {user ? (
+                            <>
+                                <li className="nav-item">
+                                    <a className="nav-link nav-link-enhanced" href="/profile" style={navLinkStyle}>
+                                        <i className="fas fa-user-circle me-2"></i>
+                                        {(user.name && user.name.split(' ')[0]) || 'Profile'}
+                                    </a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link nav-link-enhanced" href="/" onClick={handleLogout} style={navLinkStyle}>
+                                        <i className="fas fa-sign-out-alt me-2"></i>
+                                        Logout
+                                    </a>
+                                </li>
+                            </>
+                        ) : (
+                            <li className="nav-item">
+                                <a className="nav-link nav-link-enhanced" href="/login" style={navLinkStyle}>
+                                    <i className="fas fa-sign-in-alt me-2"></i>
+                                    Login
+                                </a>
+                            </li>
+                        )}
                     </ul>
                     
                     <div className="d-flex align-items-center">

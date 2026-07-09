@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const { correctGrammar, translate } = require('./grammar');
+const { verifyGoogleToken, signToken, verifyToken } = require('./auth');
 require('dotenv').config();
 
 const app = express();
@@ -72,6 +73,16 @@ const blogSchema = new mongoose.Schema({
     default: 'Anonymous',
     trim: true
   },
+  // Internal link to the author's account. Present on every account-created
+  // post (including anonymous ones); never exposed by the public API.
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  isAnonymous: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -98,6 +109,95 @@ const blogSchema = new mongoose.Schema({
   
 const Blog = mongoose.model('Blog', blogSchema, 'TextifyBlogs');
 
+// User Schema
+const userSchema = new mongoose.Schema({
+  googleId: { type: String, required: true, unique: true },
+  name: { type: String, required: true, trim: true },
+  email: { type: String, required: true, trim: true },
+  picture: { type: String },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const User = mongoose.model('User', userSchema, 'TextifyUsers');
+
+// Public shape of a blog post. NEVER exposes `user`, so the author of an
+// anonymous post can't be discovered by inspecting the API response.
+const sanitizeBlog = (blog) => ({
+  _id: blog._id,
+  title: blog.title,
+  content: blog.content,
+  author: blog.author, // already 'Anonymous' for anonymous posts
+  isAnonymous: blog.isAnonymous,
+  createdAt: blog.createdAt,
+  replies: blog.replies
+});
+
+// Require a valid app JWT; attaches the user document as req.user.
+const requireAuth = async (req, res, next) => {
+  try {
+    const header = req.headers.authorization || '';
+    const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    const payload = verifyToken(token);
+    const user = await User.findById(payload.id);
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+    req.user = user;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid or expired session' });
+  }
+};
+
+// Rate limiting for auth (prevents sign-in abuse)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30,
+  message: { error: 'Too many authentication attempts. Please try again later.' }
+});
+
+// POST /api/auth/google - Verify a Google credential, upsert the user, issue a JWT
+app.post('/api/auth/google', authLimiter, async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ error: 'Missing Google credential' });
+    }
+
+    const payload = await verifyGoogleToken(credential);
+
+    // Upsert by Google's stable user id (`sub`); refresh name/email/picture.
+    const user = await User.findOneAndUpdate(
+      { googleId: payload.sub },
+      {
+        googleId: payload.sub,
+        name: payload.name || 'User',
+        email: payload.email,
+        picture: payload.picture
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    const token = signToken(user);
+    res.json({
+      token,
+      user: { id: user._id, name: user.name, email: user.email, picture: user.picture }
+    });
+  } catch (error) {
+    console.error('Google auth error:', error.message);
+    res.status(401).json({ error: 'Google authentication failed' });
+  }
+});
+
+// GET /api/auth/me - Return the current user's profile
+app.get('/api/auth/me', requireAuth, (req, res) => {
+  const u = req.user;
+  res.json({ user: { id: u._id, name: u.name, email: u.email, picture: u.picture } });
+});
+
 // GET /api/blogs - Get all blog posts with pagination
 app.get('/api/blogs', async (req, res) => {
   try {
@@ -116,7 +216,7 @@ app.get('/api/blogs', async (req, res) => {
 
     console.log(`Found ${blogs.length} blogs, total: ${total}, pages: ${totalPages}`);
     res.json({
-      blogs,
+      blogs: blogs.map(sanitizeBlog), // strips `user`; keeps anonymous posts anonymous
       currentPage: page,
       totalPages,
       total
@@ -144,55 +244,75 @@ app.get('/api/blogs/stats', async (req, res) => {
   }
 });
 
-// POST /api/blogs - Create a new blog post
-app.post('/api/blogs', blogPostLimiter, async (req, res) => {
+// POST /api/blogs - Create a new blog post (must be logged in)
+app.post('/api/blogs', requireAuth, blogPostLimiter, async (req, res) => {
   try {
-    console.log('Received blog post request:', req.body);
-    const { title, content, author } = req.body;
+    const { title, content, isAnonymous } = req.body;
 
     // Validation
     if (!title || !content) {
-      console.log('Validation failed: Missing title or content');
       return res.status(400).json({ error: 'Title and content are required' });
     }
 
     if (title.length > 200) {
-      console.log('Validation failed: Title too long');
       return res.status(400).json({ error: 'Title must be less than 200 characters' });
     }
 
     if (content.length > 5000) {
-      console.log('Validation failed: Content too long');
       return res.status(400).json({ error: 'Content must be less than 5000 characters' });
     }
 
-    // Create new blog
+    const anonymous = !!isAnonymous;
+
+    // Identity always comes from the authenticated account — the client cannot
+    // supply an author. Anonymous posts still link to the user internally.
     const newBlog = new Blog({
       title: title.trim(),
       content: content.trim(),
-      author: author?.trim() || 'Anonymous'
+      author: anonymous ? 'Anonymous' : req.user.name,
+      user: req.user._id,
+      isAnonymous: anonymous
     });
 
-    console.log('Attempting to save blog:', newBlog);
     await newBlog.save();
-    console.log('Blog saved successfully');
 
     res.status(201).json({
       message: 'Blog post created successfully',
-      blog: {
-        id: newBlog._id,
-        title: newBlog.title,
-        content: newBlog.content,
-        author: newBlog.author,
-        createdAt: newBlog.createdAt
-      }
+      blog: sanitizeBlog(newBlog)
     });
   } catch (error) {
     console.error('Error creating blog:', error);
-    res.status(500).json({ 
-      error: 'Failed to create blog post',
-      details: error.message 
-    });
+    res.status(500).json({ error: 'Failed to create blog post' });
+  }
+});
+
+// GET /api/blogs/mine - All posts by the logged-in user (public + anonymous)
+app.get('/api/blogs/mine', requireAuth, async (req, res) => {
+  try {
+    const blogs = await Blog.find({ user: req.user._id }).sort({ createdAt: -1 });
+    // Owner sees everything, including the isAnonymous flag on their own posts.
+    res.json({ blogs });
+  } catch (error) {
+    console.error('Error fetching user blogs:', error);
+    res.status(500).json({ error: 'Failed to fetch your posts' });
+  }
+});
+
+// DELETE /api/blogs/:id - Delete own post
+app.delete('/api/blogs/:id', requireAuth, async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) {
+      return res.status(404).json({ error: 'Blog post not found' });
+    }
+    if (!blog.user || blog.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'You can only delete your own posts' });
+    }
+    await blog.deleteOne();
+    res.json({ message: 'Blog post deleted' });
+  } catch (error) {
+    console.error('Error deleting blog:', error);
+    res.status(500).json({ error: 'Failed to delete blog post' });
   }
 });
 
@@ -338,6 +458,12 @@ app.listen(PORT, () => {
 
   if (!process.env.GITHUB_TOKEN) {
     console.warn('⚠️  GITHUB_TOKEN is not set — grammar correction will fail until it is configured.');
+  }
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    console.warn('⚠️  GOOGLE_CLIENT_ID is not set — Google sign-in will fail until it is configured.');
+  }
+  if (!process.env.JWT_SECRET) {
+    console.warn('⚠️  JWT_SECRET is not set — auth tokens cannot be issued/verified.');
   }
 });
 

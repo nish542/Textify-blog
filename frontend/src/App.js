@@ -6,7 +6,11 @@ import About from './components/About.js';
 import Blog from './components/Blog.js';
 import Alert from './components/Alert.js';
 import Home from './components/Home';
+import Login from './components/Login.js';
+import Profile from './components/Profile.js';
 import { Analytics } from "@vercel/analytics/react";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { AuthProvider } from './context/AuthContext';
 import {createBrowserRouter, RouterProvider, useLocation} from 'react-router-dom';
 
 // Create a wrapper component to handle scroll restoration
@@ -76,10 +80,20 @@ function App() {
     {
       path: '/blogs',
       element: <ScrollToTopWrapper><Blog mode={mode} showAlert={showAlert} /></ScrollToTopWrapper>
+    },
+    {
+      path: '/login',
+      element: <ScrollToTopWrapper><Login mode={mode} /></ScrollToTopWrapper>
+    },
+    {
+      path: '/profile',
+      element: <ScrollToTopWrapper><Profile mode={mode} /></ScrollToTopWrapper>
     }
   ]);
   
   return (
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || ''}>
+    <AuthProvider>
     <div className={`app-container ${mode}`} style={{ minHeight: '100vh', position: 'relative' }}>
       <Analytics />
       {/* Abstract background shapes for the whole app */}
@@ -151,6 +165,8 @@ function App() {
         <RouterProvider router={router} />
       </div>
     </div>
+    </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 
